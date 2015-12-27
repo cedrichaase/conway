@@ -44,7 +44,7 @@ Cell.prototype.toggleValue = function() {
  *
  * @param width
  * @param height
- * @returns {{width: *, height: *, matrix: *, neighbors: (Grid.getNeighbors|*), getCell: *, toggleCell: *}}
+ * @returns {{width: *, height: *, matrix: *, neighbors: (Grid.getNeighbors|*), getCell: *}}
  * @constructor
  */
 var Grid = function (width, height) {
@@ -61,9 +61,7 @@ var Grid = function (width, height) {
         cellIsBorn: this.cellIsBorn,
         cellDies: this.cellDies,
         executeConway: this.executeConway,
-        getCell: this.getCell,
-
-        toggleCell: this.toggleCell
+        getCell: this.getCell
     };
 };
 
@@ -86,15 +84,6 @@ Grid.prototype.init = function (width, height) {
     }
 };
 
-/**
- * Toggles Cell value
- *
- * @param x
- * @param y
- */
-Grid.prototype.toggleCell = function(x, y) {
-    this.getCell(x, y).toggleValue();
-};
 
 /**
  * Returns a Cell by grid coordinates
@@ -361,13 +350,13 @@ Grid.prototype.executeConway = function() {
      *
      * @param x
      * @param y
-     * @returns {{x: number, y: number}}
+     * @returns Cell
      */
     Conway.prototype.getCellByCoords = function(x, y) {
         var cellX = Math.floor(x / this.element.width * this.options.hCells);
         var cellY = Math.floor(y / this.element.height * this.options.vCells);
 
-        return {x: cellX, y: cellY};
+        return this.grid.getCell(cellX, cellY);
     };
 
     /**
@@ -382,7 +371,7 @@ Grid.prototype.executeConway = function() {
         this.element.addEventListener('mousedown', function(e) {
             var mouse = _this.getMouse(e);
             var cell = _this.getCellByCoords(mouse.x, mouse.y);
-            _this.grid.toggleCell(cell.x, cell.y);
+            cell.toggleValue();
         });
     };
 
