@@ -8,7 +8,9 @@
     <div class="canvas-container">
       <canvas id="canvas1" width="640" height="480"></canvas>
       <br/>
-      <button onclick="$('#canvas1').conway('toggleExecution')">Go</button>
+      <button onclick="$('#canvas1').conway('toggleExecution')">Toggle execution</button>
+      <button onclick="$('#canvas1').conway('toggleGrid')">Toggle grid</button>
+      <input name="color" id="color" type="color" value="#000000">
     </div>
 
     <script src="./bower_components/jquery/dist/jquery.js"></script>
@@ -16,7 +18,16 @@
   	<script type="text/javascript">
 
       $(function() {
-        $('#canvas1').conway();
+        var canvas = $('#canvas1');
+        var slider = $('#color');
+
+        canvas.conway();
+
+
+        slider.on('change', function(e){
+          var color = slider.val();
+          canvas.conway('setGridColor', {gridColor: color});
+        });
       });
 
   	</script>
