@@ -230,6 +230,7 @@ Grid.prototype.executeConway = function() {
 
         gridColor: '#000',
         gridLineWidth: 1,
+        showGrid: true,
 
         hCells: 32,
         vCells: 24,
@@ -270,7 +271,9 @@ Grid.prototype.executeConway = function() {
             stop: $.proxy(this.stop, this),
             toggleRunning: $.proxy(this.toggleRunning, this),
             execute: $.proxy(this.execute, this),
-            toggleExecution: $.proxy(this.toggleExecution, this)
+            toggleExecution: $.proxy(this.toggleExecution, this),
+            toggleGrid: $.proxy(this.toggleGrid, this),
+            setGridColor: $.proxy(this.setGridColor, this)
         };
     };
 
@@ -289,6 +292,14 @@ Grid.prototype.executeConway = function() {
 
     Conway.prototype.toggleExecution = function(){
         this.executing = !this.executing;
+    };
+
+    Conway.prototype.toggleGrid = function() {
+        this.options.showGrid = !this.options.showGrid;
+    };
+
+    Conway.prototype.setGridColor = function(options) {
+        this.options.gridColor = options.gridColor;
     };
 
     Conway.prototype.toggleRunning = function() {
@@ -325,7 +336,8 @@ Grid.prototype.executeConway = function() {
         if(this.executing)
             this.execute();
 
-        this.drawGrid(this.options.hCells, this.options.vCells, this.options.gridLineWidth, this.options.gridColor);
+        if(this.options.showGrid)
+            this.drawGrid(this.options.hCells, this.options.vCells, this.options.gridLineWidth, this.options.gridColor);
 
         this.drawBoolMatrix(this.grid.matrix);
     };
@@ -483,27 +495,6 @@ Grid.prototype.executeConway = function() {
 
         this.ctx.save();
             this.ctx.fillRect(xPos, yPos, cellWidth, cellHeight);
-        this.ctx.restore();
-    };
-
-    Conway.prototype.radialLineAtAngle = function(angleFraction, highlight) {
-        this.ctx.save();
-        this.ctx.translate(this.element.width/2, this.element.height/2);
-        this.ctx.rotate(Math.PI * (2.0 * angleFraction - 0.5));
-
-        if(highlight) {
-            this.ctx.lineWidth = this.options.highlightTickWidth;
-            this.ctx.strokeStyle = this.options.highlightTickColor;
-        }
-        else {
-            this.ctx.lineWidth = this.options.tickWidth;
-            this.ctx.strokeStyle = this.options.tickColor;
-        }
-
-        this.ctx.beginPath();
-        this.ctx.moveTo(0,this.radius-130);
-        this.ctx.lineTo(0,this.radius-125);
-        this.ctx.stroke();
         this.ctx.restore();
     };
 
