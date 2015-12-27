@@ -13,6 +13,7 @@
 
         gridColor: '#000',
         gridLineWidth: 1,
+        showGrid: true,
 
         hCells: 32,
         vCells: 24,
@@ -53,7 +54,9 @@
             stop: $.proxy(this.stop, this),
             toggleRunning: $.proxy(this.toggleRunning, this),
             execute: $.proxy(this.execute, this),
-            toggleExecution: $.proxy(this.toggleExecution, this)
+            toggleExecution: $.proxy(this.toggleExecution, this),
+            toggleGrid: $.proxy(this.toggleGrid, this),
+            setGridColor: $.proxy(this.setGridColor, this)
         };
     };
 
@@ -72,6 +75,14 @@
 
     Conway.prototype.toggleExecution = function(){
         this.executing = !this.executing;
+    };
+
+    Conway.prototype.toggleGrid = function() {
+        this.options.showGrid = !this.options.showGrid;
+    };
+
+    Conway.prototype.setGridColor = function(options) {
+        this.options.gridColor = options.gridColor;
     };
 
     Conway.prototype.toggleRunning = function() {
@@ -108,7 +119,8 @@
         if(this.executing)
             this.execute();
 
-        this.drawGrid(this.options.hCells, this.options.vCells, this.options.gridLineWidth, this.options.gridColor);
+        if(this.options.showGrid)
+            this.drawGrid(this.options.hCells, this.options.vCells, this.options.gridLineWidth, this.options.gridColor);
 
         this.drawBoolMatrix(this.grid.matrix);
     };
