@@ -21,12 +21,12 @@
         var canvas = $('#canvas1');
         var slider = $('#color');
 
-        canvas.conway();
-
+        var canvasElement = document.getElementById('canvas1');
+        new GridCanvas(canvasElement, 16, 12);
 
         slider.on('change', function(e){
           var color = slider.val();
-          canvas.conway('setGridColor', {gridColor: color});
+//          canvas.conway('setGridColor', {gridColor: color});
         });
       });
 

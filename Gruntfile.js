@@ -19,16 +19,16 @@ module.exports = function(grunt) {
 
     concat: {
       options: {
-        separator: ';'
+        separator: grunt.util.linefeed + ';' + grunt.util.linefeed
       },
       dist: {
-        src: ['src/classes/Cell.js', 'src/classes/Grid.js', 'src/classes/Conway.js', 'src/classes/Canvas.js'],
+        src: ['src/classes/*.js'],
         dest: 'src/conway.js'
       }
     },
 
     copy: {
-      main: { 
+      main: {
         files: [
           // copy src to example
           { expand: true, cwd: 'src/', src: 'conway.js', dest: 'public/js/' }
