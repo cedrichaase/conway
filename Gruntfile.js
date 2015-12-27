@@ -31,7 +31,7 @@ module.exports = function(grunt) {
       main: { 
         files: [
           // copy src to example
-          { expand: true, cwd: 'src/', src: '*', dest: 'public/js/' }
+          { expand: true, cwd: 'src/', src: 'conway.js', dest: 'public/js/' }
         ]
       }
     }
