@@ -281,27 +281,6 @@
         this.ctx.restore();
     };
 
-    Conway.prototype.radialLineAtAngle = function(angleFraction, highlight) {
-        this.ctx.save();
-        this.ctx.translate(this.element.width/2, this.element.height/2);
-        this.ctx.rotate(Math.PI * (2.0 * angleFraction - 0.5));
-
-        if(highlight) {
-            this.ctx.lineWidth = this.options.highlightTickWidth;
-            this.ctx.strokeStyle = this.options.highlightTickColor;
-        }
-        else {
-            this.ctx.lineWidth = this.options.tickWidth;
-            this.ctx.strokeStyle = this.options.tickColor;
-        }
-
-        this.ctx.beginPath();
-        this.ctx.moveTo(0,this.radius-130);
-        this.ctx.lineTo(0,this.radius-125);
-        this.ctx.stroke();
-        this.ctx.restore();
-    };
-
     // Add inline style into head
     Conway.prototype.injectStyle = function () {
         if (this.options.injectStyle && !document.getElementById(this.styleId)) {
