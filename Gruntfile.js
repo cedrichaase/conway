@@ -22,7 +22,7 @@ module.exports = function(grunt) {
         separator: ';'
       },
       dist: {
-        src: ['src/classes/Cell.js', 'src/classes/Grid.js', 'src/classes/Conway.js'],
+        src: ['src/classes/Cell.js', 'src/classes/Grid.js', 'src/classes/Conway.js', 'src/classes/Canvas.js'],
         dest: 'src/conway.js'
       }
     },

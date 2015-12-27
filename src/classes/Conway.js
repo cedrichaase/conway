@@ -35,8 +35,7 @@
         this.elementId = element.id;
         this.styleId = this.elementId + '-style';
 
-        this.ctx = this.element.getContext('2d');
-        this.radius = this.element.height > this.element.width ? this.element.width : this.element.height;
+        this.canvas = new Canvas(this.element);
         this.executing = false;
 
         this.init(options);
@@ -107,14 +106,10 @@
     };
 
     Conway.prototype.render = function() {
-
-        // set size to minimum of width/height
-        var size = this.radius;
-
         var width = this.element.width;
         var height = this.element.height;
 
-        this.ctx.clearRect(0, 0, width, height);  // clears rectangle after each move
+        this.canvas.ctx.clearRect(0, 0, width, height);  // clears rectangle after each move
 
         if(this.executing)
             this.execute();
@@ -123,20 +118,6 @@
             this.drawGrid(this.options.hCells, this.options.vCells, this.options.gridLineWidth, this.options.gridColor);
 
         this.drawBoolMatrix(this.grid.matrix);
-    };
-
-    /**
-     *
-     * @param e
-     * @returns {{x: (number|*), y: (number|*)}}
-     */
-    Conway.prototype.getMouse = function(e) {
-        var offset = this.$element.offset();
-        var mx = e.pageX - offset.left;
-        var my = e.pageY - offset.top;
-
-        // We return a simple javascript object (a hash) with x and y defined
-        return {x: mx, y: my};
     };
 
     /**
@@ -163,7 +144,7 @@
     Conway.prototype.addListeners = function() {
         var _this = this;
         this.element.addEventListener('mousedown', function(e) {
-            var mouse = _this.getMouse(e);
+            var mouse = _this.canvas.getMouse(e);
             var cell = _this.getCellByCoords(mouse.x, mouse.y);
             cell.toggleValue();
         });
@@ -236,15 +217,15 @@
     Conway.prototype.drawHorizontalLine = function(y, lineWidth, color) {
         var width = this.element.width;
 
-        this.ctx.save();
-            this.ctx.strokeStyle = color;
-            this.ctx.fillStyle = color;
-            this.ctx.lineWidth = lineWidth;
-            this.ctx.beginPath();
-            this.ctx.moveTo(0, y);
-            this.ctx.lineTo(width, y);
-            this.ctx.stroke();
-        this.ctx.restore();
+        this.canvas.ctx.save();
+            this.canvas.ctx.strokeStyle = color;
+            this.canvas.ctx.fillStyle = color;
+            this.canvas.ctx.lineWidth = lineWidth;
+            this.canvas.ctx.beginPath();
+            this.canvas.ctx.moveTo(0, y);
+            this.canvas.ctx.lineTo(width, y);
+            this.canvas.ctx.stroke();
+        this.canvas.ctx.restore();
     };
 
     /**
@@ -258,15 +239,15 @@
 
         var height = this.element.height;
 
-        this.ctx.save();
-            this.ctx.strokeStyle = color;
-            this.ctx.fillStyle = color;
-            this.ctx.lineWidth = lineWidth;
-            this.ctx.beginPath();
-            this.ctx.moveTo(x, 0);
-            this.ctx.lineTo(x, height);
-            this.ctx.stroke();
-        this.ctx.restore();
+        this.canvas.ctx.save();
+            this.canvas.ctx.strokeStyle = color;
+            this.canvas.ctx.fillStyle = color;
+            this.canvas.ctx.lineWidth = lineWidth;
+            this.canvas.ctx.beginPath();
+            this.canvas.ctx.moveTo(x, 0);
+            this.canvas.ctx.lineTo(x, height);
+            this.canvas.ctx.stroke();
+        this.canvas.ctx.restore();
     };
 
     Conway.prototype.fillCell = function(x, y) {
@@ -276,9 +257,9 @@
         var xPos = x * cellWidth;
         var yPos = y * cellHeight;
 
-        this.ctx.save();
-            this.ctx.fillRect(xPos, yPos, cellWidth, cellHeight);
-        this.ctx.restore();
+        this.canvas.ctx.save();
+            this.canvas.ctx.fillRect(xPos, yPos, cellWidth, cellHeight);
+        this.canvas.ctx.restore();
     };
 
     // Add inline style into head
