@@ -44,5 +44,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
 
   // register one or more task lists (you should ALWAYS have a "default" task list)
-  grunt.registerTask('default', ['concat', 'uglify', 'copy', 'watch']);
+  grunt.registerTask('dist', ['concat', 'uglify', 'copy']);
+  grunt.registerTask('default', ['dist', 'watch']);
 };
