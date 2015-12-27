@@ -3,7 +3,7 @@
  *
  * @param width
  * @param height
- * @returns {{width: *, height: *, matrix: *, neighbors: (Grid.getNeighbors|*), getCell: *, toggleCell: *}}
+ * @returns {{width: *, height: *, matrix: *, neighbors: (Grid.getNeighbors|*), getCell: *}}
  * @constructor
  */
 var Grid = function (width, height) {
@@ -20,9 +20,7 @@ var Grid = function (width, height) {
         cellIsBorn: this.cellIsBorn,
         cellDies: this.cellDies,
         executeConway: this.executeConway,
-        getCell: this.getCell,
-
-        toggleCell: this.toggleCell
+        getCell: this.getCell
     };
 };
 
@@ -45,15 +43,6 @@ Grid.prototype.init = function (width, height) {
     }
 };
 
-/**
- * Toggles Cell value
- *
- * @param x
- * @param y
- */
-Grid.prototype.toggleCell = function(x, y) {
-    this.getCell(x, y).toggleValue();
-};
 
 /**
  * Returns a Cell by grid coordinates

@@ -144,13 +144,13 @@
      *
      * @param x
      * @param y
-     * @returns {{x: number, y: number}}
+     * @returns Cell
      */
     Conway.prototype.getCellByCoords = function(x, y) {
         var cellX = Math.floor(x / this.element.width * this.options.hCells);
         var cellY = Math.floor(y / this.element.height * this.options.vCells);
 
-        return {x: cellX, y: cellY};
+        return this.grid.getCell(cellX, cellY);
     };
 
     /**
@@ -165,7 +165,7 @@
         this.element.addEventListener('mousedown', function(e) {
             var mouse = _this.getMouse(e);
             var cell = _this.getCellByCoords(mouse.x, mouse.y);
-            _this.grid.toggleCell(cell.x, cell.y);
+            cell.toggleValue();
         });
     };
 
