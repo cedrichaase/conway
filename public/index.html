@@ -6,11 +6,12 @@
   </head>
   <body>
     <div class="canvas-container">
-      <canvas id="canvas1" width="640" height="480"></canvas>
+      <canvas id="canvas1" width="1024" height="768"></canvas>
       <br/>
-      <button onclick="$('#canvas1').conway('toggleExecution')">Toggle execution</button>
-      <button onclick="$('#canvas1').conway('toggleGrid')">Toggle grid</button>
-      <input name="color" id="color" type="color" value="#000000">
+      <button id="toggleExec">Toggle execution</button>
+      <button id="toggleGrid">Toggle grid</button>
+      <!--<button onclick="$('#canvas1').conway('toggleGrid')">Toggle grid</button>-->
+      <!--<input name="color" id="color" type="color" value="#000000">-->
     </div>
 
     <script src="./bower_components/jquery/dist/jquery.js"></script>
@@ -22,12 +23,22 @@
         var slider = $('#color');
 
         var canvasElement = document.getElementById('canvas1');
-        new GridCanvas(canvasElement, 16, 12);
+        var conwayCanvas = new ConwayCanvas(canvasElement, 32, 24);
 
-        slider.on('change', function(e){
-          var color = slider.val();
+        var toggleExec = document.getElementById('toggleExec');
+        toggleExec.onclick = function(e) {
+          conwayCanvas.toggleExecution();
+        };
+
+        var toggleGrid = document.getElementById('toggleGrid');
+        toggleGrid.onclick = function(e) {
+          conwayCanvas.toggleShowGrid();
+        };
+
+//        slider.on('change', function(e){
+//          var color = slider.val();
 //          canvas.conway('setGridColor', {gridColor: color});
-        });
+//        });
       });
 
   	</script>
