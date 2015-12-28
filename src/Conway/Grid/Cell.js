@@ -1,108 +1,89 @@
-/// <reference path="../../vendor/jquery.d.ts" />
+/// <reference path="../../../vendor/jquery.d.ts" />
 ///<reference path="Grid.ts"/>
-
 /**
  * Class Cell
  */
-class Cell {
-
-    /**
-     * The cell value
-     */
-    public value: boolean;
-
-    /**
-     * The cell coordinates
-     */
-    public coords: Vector2D;
-
+var Cell = (function () {
     /**
      * The constructor
      *
      * @param coords
      * @param value
      */
-    constructor(coords: Vector2D, value: boolean) {
+    function Cell(coords, value) {
         this.coords = coords;
         this.value = value;
     }
-
     /**
      * Toggles the cell value
      */
-    toggleValue(): void {
+    Cell.prototype.toggleValue = function () {
         this.value = !this.value;
-    }
-
+    };
     /**
      * Return coordinates to this cell's top left
      *
      * @returns {Vector2D}
      */
-    getCoordsTopLeft() {
+    Cell.prototype.getCoordsTopLeft = function () {
         return new Vector2D(this.coords.x - 1, this.coords.y - 1);
-    }
-
+    };
     /**
      * Return coordinates to this cell's top
      *
      * @returns {Vector2D}
      */
-    getCoordsTop() {
+    Cell.prototype.getCoordsTop = function () {
         return new Vector2D(this.coords.x, this.coords.y - 1);
-    }
-
+    };
     /**
      * Return coordinates to this cell's top right
      *
      * @returns {Vector2D}
      */
-    getCoordsTopRight() {
+    Cell.prototype.getCoordsTopRight = function () {
         return new Vector2D(this.coords.x + 1, this.coords.y - 1);
-    }
-
+    };
     /**
      * Return coordinates to this cell's right
      *
      * @returns {Vector2D}
      */
-    getCoordsRight() {
+    Cell.prototype.getCoordsRight = function () {
         return new Vector2D(this.coords.x + 1, this.coords.y);
-    }
-
+    };
     /**
      * Return coordinates to this cell's bottom right
      *
      * @returns {Vector2D}
      */
-    getCoordsBottomRight() {
+    Cell.prototype.getCoordsBottomRight = function () {
         return new Vector2D(this.coords.x + 1, this.coords.y + 1);
-    }
-
+    };
     /**
      * Return coordinates to this cell's bottom
      *
      * @returns {Vector2D}
      */
-    getCoordsBottom() {
+    Cell.prototype.getCoordsBottom = function () {
         return new Vector2D(this.coords.x, this.coords.y + 1);
-    }
-
+    };
     /**
      * Return coordinates to this cell's bottom left
      *
      * @returns {Vector2D}
      */
-    getCoordsBottomLeft() {
+    Cell.prototype.getCoordsBottomLeft = function () {
         return new Vector2D(this.coords.x - 1, this.coords.y + 1);
-    }
-
+    };
     /**
      * Return coordinates to this cell's left
      *
      * @returns {Vector2D}
      */
-    getCoordsLeft() {
+    Cell.prototype.getCoordsLeft = function () {
         return new Vector2D(this.coords.x - 1, this.coords.y);
-    }
-}
+    };
+    return Cell;
+})();
+//# sourceMappingURL=Cell.js.map

@@ -1,6 +1,6 @@
-/// <reference path="../../vendor/jquery.d.ts" />
+/// <reference path="../../../vendor/jquery.d.ts" />
 /// <reference path="Cell.ts" />
-///<reference path="Vector2D.ts"/>
+///<reference path="../Canvas/Vector2D.ts"/>
 ///<reference path="NeighborCoordinates.ts"/>
 ///<reference path="NeighborCells.ts"/>
 
@@ -90,83 +90,5 @@ class Grid {
         neighborCells.left          = this.getCell(neighborCoords.left);
 
         return neighborCells;
-    }
-
-    /**
-     * Counts the live cells surrounding the given Cell
-     *
-     * @param cell
-     * @returns {number}
-     */
-    countLiveNeighbors(cell: Cell) {
-        var neighbors = this.getNeighbors(cell);
-
-        var count = 0;
-
-        if(neighbors.top.value)
-            count++;
-        if(neighbors.bottom.value)
-            count++;
-        if(neighbors.left.value)
-            count++;
-        if(neighbors.right.value)
-            count++;
-        if(neighbors.topLeft.value)
-            count++;
-        if(neighbors.topRight.value)
-            count++;
-        if(neighbors.bottomLeft.value)
-            count++;
-        if(neighbors.bottomRight.value)
-            count++;
-
-        return count;
-    }
-
-    /**
-     * Checks if a cell will die in the next generation
-     *
-     * @param cell
-     * @returns {*|boolean}
-     */
-    cellDies(cell: Cell) {
-        var neighborCount = this.countLiveNeighbors(cell);
-        return cell.value && (neighborCount > 3 || neighborCount < 2);
-    }
-
-    /**
-     * Check if cell will come alive in the next generation
-     *
-     * @param cell
-     * @returns {boolean}
-     */
-    cellIsBorn(cell: Cell) {
-        var neighborCount = this.countLiveNeighbors(cell);
-        return (!cell.value) && neighborCount == 3;
-    }
-
-    executeConway() {
-        var nextGen = $.extend(true, {}, this);
-
-        var width = this.width;
-        var height = this.height;
-
-        for(var x = 0; x < width; x++) {
-            for(var y = 0; y < height; y++) {
-                var coords = new Vector2D(x, y);
-                var oldCell = this.getCell(coords);
-                var newCell = nextGen.getCell(coords);
-
-                if(!oldCell.value === true) {
-                    if(this.cellIsBorn(oldCell))
-                        newCell.value = true;
-                }
-                else if(oldCell.value === true) {
-                    newCell.value = !this.cellDies(oldCell);
-                }
-            }
-        }
-
-        return nextGen;
     }
 }

@@ -1,4 +1,4 @@
-///<reference path="Canvas.ts"/>
+///<reference path="../Canvas/Canvas.ts"/>
 ///<reference path="Grid.ts"/>
 
 class GridCanvas extends Canvas {
@@ -19,6 +19,11 @@ class GridCanvas extends Canvas {
     private gridColor: string;
 
     /**
+     * Show or show not? That is the question.
+     */
+    private showGrid: boolean;
+
+    /**
      *
      *
      * @param element
@@ -30,8 +35,17 @@ class GridCanvas extends Canvas {
 
         this.grid = new Grid(hCells, vCells);
 
+        this.showGrid = true;
+
         this.addEventListeners();
         this.start();
+    }
+
+    /**
+     * Toggle showing the grid
+     */
+    public toggleShowGrid() {
+        this.showGrid = !this.showGrid;
     }
 
     private drawGrid() {
@@ -137,7 +151,9 @@ class GridCanvas extends Canvas {
 
     protected render() {
         super.clear();
-        this.drawGrid();
+        if(this.showGrid) {
+            this.drawGrid();
+        }
         this.drawGridMatrix();
     }
 }
