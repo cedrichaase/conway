@@ -47,7 +47,7 @@ class ConwayGrid extends Grid {
      * Checks if a cell will die in the next generation
      *
      * @param cell
-     * @returns {*|boolean}
+     * @returns {boolean}
      */
     private cellDies(cell: Cell) {
         var neighborCount = this.countLiveNeighbors(cell);
