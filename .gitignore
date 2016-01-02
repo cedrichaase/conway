@@ -1,5 +1,5 @@
 node_modules/
 public/bower_components/
 .idea/
-src/Conway/*.js
-src/Conway/*.map
+src/**/*.js
+src/**/*.js.map
