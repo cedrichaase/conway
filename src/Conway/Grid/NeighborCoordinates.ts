@@ -18,7 +18,7 @@ class NeighborCoordinates {
 
     public left: Vector2D;
 
-    constructor(cell) {
+    constructor(cell: Cell) {
         this.topLeft        = cell.getCoordsTopLeft();
         this.top            = cell.getCoordsTop();
         this.topRight       = cell.getCoordsTopRight();
