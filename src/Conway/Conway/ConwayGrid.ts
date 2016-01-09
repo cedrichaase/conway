@@ -83,10 +83,10 @@ class ConwayGrid extends Grid {
     /**
      * Executes one step of the Conway Game Of Life Algorithm
      *
-     * @returns {*}
+     * @returns {ConwayGrid}
      */
     public executeConway() {
-        var nextGen = $.extend(true, {}, this);
+        var nextGen = new ConwayGrid(this.width, this.height);
 
         var width = this.width;
         var height = this.height;

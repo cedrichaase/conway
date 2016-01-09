@@ -40,7 +40,7 @@ class ConwayCanvas extends GridCanvas {
         super.render();
 
         if(this.executing) {
-            this.grid.executeConway();
+            this.grid = this.grid.executeConway();
         }
     }
 }
