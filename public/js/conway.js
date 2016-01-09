@@ -434,7 +434,7 @@ var ConwayCanvas = (function (_super) {
     ConwayCanvas.prototype.render = function () {
         _super.prototype.render.call(this);
         if (this.executing) {
-            this.grid.executeConway();
+            this.grid = this.grid.executeConway();
         }
     };
     return ConwayCanvas;
@@ -486,32 +486,43 @@ var ConwayGrid = (function (_super) {
         return count;
     };
     /**
-     * Checks if a cell will die in the next generation
-     *
-     * @param cell
-     * @returns {*|boolean}
-     */
-    ConwayGrid.prototype.cellDies = function (cell) {
-        var neighborCount = this.countLiveNeighbors(cell);
-        return cell.value && (neighborCount > 3 || neighborCount < 2);
-    };
-    /**
-     * Check if cell will come alive in the next generation
+     * Determines whether or not the given cell will survive in the next generation
      *
      * @param cell
      * @returns {boolean}
      */
-    ConwayGrid.prototype.cellIsBorn = function (cell) {
+    ConwayGrid.prototype.livesInNextGeneration = function (cell) {
         var neighborCount = this.countLiveNeighbors(cell);
-        return (!cell.value) && neighborCount == 3;
+        // Any live cell with fewer than two live neighbours dies, as if caused by under-population.
+        if (cell.value === true
+            && neighborCount < 2) {
+            return false;
+        }
+        // Any live cell with two or three live neighbours lives on to the next generation.
+        if (cell.value === true
+            && neighborCount < 4
+            && neighborCount > 1) {
+            return true;
+        }
+        // Any live cell with more than three live neighbours dies, as if by over-population.
+        if (cell.value === true
+            && neighborCount > 3) {
+            return false;
+        }
+        // Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
+        if (cell.value === false
+            && neighborCount === 3) {
+            return true;
+        }
+        return false;
     };
     /**
      * Executes one step of the Conway Game Of Life Algorithm
      *
-     * @returns {*}
+     * @returns {ConwayGrid}
      */
     ConwayGrid.prototype.executeConway = function () {
-        var nextGen = $.extend(true, {}, this);
+        var nextGen = new ConwayGrid(this.width, this.height);
         var width = this.width;
         var height = this.height;
         for (var x = 0; x < width; x++) {
@@ -519,13 +530,7 @@ var ConwayGrid = (function (_super) {
                 var coords = new Vector2D(x, y);
                 var oldCell = this.getCell(coords);
                 var newCell = nextGen.getCell(coords);
-                if (!oldCell.value === true) {
-                    if (this.cellIsBorn(oldCell))
-                        newCell.value = true;
-                }
-                else if (oldCell.value === true) {
-                    newCell.value = !this.cellDies(oldCell);
-                }
+                newCell.value = this.livesInNextGeneration(oldCell);
             }
         }
         return nextGen;

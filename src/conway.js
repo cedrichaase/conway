@@ -434,7 +434,7 @@ var ConwayCanvas = (function (_super) {
     ConwayCanvas.prototype.render = function () {
         _super.prototype.render.call(this);
         if (this.executing) {
-            this.grid.executeConway();
+            this.grid = this.grid.executeConway();
         }
     };
     return ConwayCanvas;
@@ -519,10 +519,10 @@ var ConwayGrid = (function (_super) {
     /**
      * Executes one step of the Conway Game Of Life Algorithm
      *
-     * @returns {*}
+     * @returns {ConwayGrid}
      */
     ConwayGrid.prototype.executeConway = function () {
-        var nextGen = $.extend(true, {}, this);
+        var nextGen = new ConwayGrid(this.width, this.height);
         var width = this.width;
         var height = this.height;
         for (var x = 0; x < width; x++) {
