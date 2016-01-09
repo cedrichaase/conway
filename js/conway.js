@@ -1,593 +1,540 @@
-/**
- * The Cell class
- *
- * @param x
- * @param y
- * @param value
- * @returns {{value: *, x: *, y: *}}
- * @constructor
- */
-var Cell = function (x, y, value) {
-
-    this.init(x, y, value);
-
-    return {
-        value: this.value,
-
-        toggleValue: this.toggleValue,
-
-        x: this.x,
-        y: this.y
+///<reference path="Vector2D.ts"/>
+/// <reference path="../../../vendor/jquery.d.ts" />
+var Canvas = (function () {
+    /**
+     * The constructor
+     *
+     * @param element
+     */
+    function Canvas(element) {
+        /**
+         * The rendering interval in milliseconds
+         */
+        this.renderInterval = 100;
+        this.element = element;
+        this.$element = $(element);
+        this.ctx = element.getContext('2d');
+    }
+    /**
+     * Returns the mouse pointer position in relation to the canvas
+     *
+     * @param event
+     * @returns {Vector2D}
+     */
+    Canvas.prototype.getMouse = function (event) {
+        var offset = this.$element.offset();
+        var mx = event.pageX - offset.left;
+        var my = event.pageY - offset.top;
+        return new Vector2D(mx, my);
     };
-};
-
+    /**
+     * Clears the canvas
+     */
+    Canvas.prototype.clear = function () {
+        this.ctx.clearRect(0, 0, this.element.width, this.element.height);
+    };
+    /**
+     * starts/stops Canvas rendering
+     */
+    Canvas.prototype.toggleActive = function () {
+        if (this.active)
+            this.stop();
+        else
+            this.start();
+    };
+    /**
+     * Stops Canvas rendering
+     */
+    Canvas.prototype.stop = function () {
+        if (this.active) {
+            clearInterval(this.interval);
+            this.active = false;
+        }
+    };
+    /**
+     * Starts Canvas rendering
+     */
+    Canvas.prototype.start = function () {
+        if (!this.active) {
+            var _this = this;
+            this.interval = setInterval(function () {
+                _this.render();
+            }, this.renderInterval);
+            this.active = true;
+        }
+    };
+    /**
+     * Renders the Canvas
+     */
+    Canvas.prototype.render = function () {
+        this.clear();
+    };
+    return Canvas;
+})();
+//# sourceMappingURL=Canvas.js.map
+;
 /**
- * Initialize cell
- *
- * @param x
- * @param y
- * @param value
+ * Generic 2D Number Vector Class
  */
-Cell.prototype.init = function(x, y, value) {
-    this.x = x;
-    this.y = y;
-    this.value = value;
-};
-
+var Vector2D = (function () {
+    /**
+     * The constructor
+     *
+     * @param x
+     * @param y
+     */
+    function Vector2D(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+    return Vector2D;
+})();
+//# sourceMappingURL=Vector2D.js.map
+;
+/// <reference path="../../../vendor/jquery.d.ts" />
+///<reference path="Grid.ts"/>
 /**
- * Toggles the cell value
+ * Class Cell
  */
-Cell.prototype.toggleValue = function() {
-    this.value = !this.value;
-};;/**
+var Cell = (function () {
+    /**
+     * The constructor
+     *
+     * @param coords
+     * @param value
+     */
+    function Cell(coords, value) {
+        this.coords = coords;
+        this.value = value;
+    }
+    /**
+     * Toggles the cell value
+     */
+    Cell.prototype.toggleValue = function () {
+        this.value = !this.value;
+    };
+    /**
+     * Return coordinates to this cell's top left
+     *
+     * @returns {Vector2D}
+     */
+    Cell.prototype.getCoordsTopLeft = function () {
+        return new Vector2D(this.coords.x - 1, this.coords.y - 1);
+    };
+    /**
+     * Return coordinates to this cell's top
+     *
+     * @returns {Vector2D}
+     */
+    Cell.prototype.getCoordsTop = function () {
+        return new Vector2D(this.coords.x, this.coords.y - 1);
+    };
+    /**
+     * Return coordinates to this cell's top right
+     *
+     * @returns {Vector2D}
+     */
+    Cell.prototype.getCoordsTopRight = function () {
+        return new Vector2D(this.coords.x + 1, this.coords.y - 1);
+    };
+    /**
+     * Return coordinates to this cell's right
+     *
+     * @returns {Vector2D}
+     */
+    Cell.prototype.getCoordsRight = function () {
+        return new Vector2D(this.coords.x + 1, this.coords.y);
+    };
+    /**
+     * Return coordinates to this cell's bottom right
+     *
+     * @returns {Vector2D}
+     */
+    Cell.prototype.getCoordsBottomRight = function () {
+        return new Vector2D(this.coords.x + 1, this.coords.y + 1);
+    };
+    /**
+     * Return coordinates to this cell's bottom
+     *
+     * @returns {Vector2D}
+     */
+    Cell.prototype.getCoordsBottom = function () {
+        return new Vector2D(this.coords.x, this.coords.y + 1);
+    };
+    /**
+     * Return coordinates to this cell's bottom left
+     *
+     * @returns {Vector2D}
+     */
+    Cell.prototype.getCoordsBottomLeft = function () {
+        return new Vector2D(this.coords.x - 1, this.coords.y + 1);
+    };
+    /**
+     * Return coordinates to this cell's left
+     *
+     * @returns {Vector2D}
+     */
+    Cell.prototype.getCoordsLeft = function () {
+        return new Vector2D(this.coords.x - 1, this.coords.y);
+    };
+    return Cell;
+})();
+//# sourceMappingURL=Cell.js.map
+;
+/// <reference path="../../../vendor/jquery.d.ts" />
+/// <reference path="Cell.ts" />
+///<reference path="../Canvas/Vector2D.ts"/>
+///<reference path="NeighborCoordinates.ts"/>
+///<reference path="NeighborCells.ts"/>
+/**
  * The Grid class
  *
  * @param width
  * @param height
- * @returns {{width: *, height: *, matrix: *, neighbors: (Grid.getNeighbors|*), getCell: *, toggleCell: *}}
+ * @returns {{width: *, height: *, matrix: *, neighbors: (Grid.getNeighbors|*), getCell: *}}
  * @constructor
  */
-var Grid = function (width, height) {
-
-    this.init(width, height);
-
-    return {
-        width: this.width,
-        height: this.height,
-        matrix: this.matrix,
-
-        getNeighbors: this.getNeighbors,
-        countNeighbors: this.countNeighbors,
-        cellIsBorn: this.cellIsBorn,
-        cellDies: this.cellDies,
-        executeConway: this.executeConway,
-        getCell: this.getCell,
-
-        toggleCell: this.toggleCell
-    };
-};
-
-/**
- * Initialize grid
- *
- * @param width
- * @param height
- */
-Grid.prototype.init = function (width, height) {
-    this.width = width;
-    this.height = height;
-
-    this.matrix = [];
-    for(var column = 0; column < width; column++) {
-        this.matrix[column] = [];
-        for(var line = 0; line < height; line++) {
-            this.matrix[column][line] = new Cell(column, line, false);
-        }
-    }
-};
-
-/**
- * Toggles Cell value
- *
- * @param x
- * @param y
- */
-Grid.prototype.toggleCell = function(x, y) {
-    this.getCell(x, y).toggleValue();
-};
-
-/**
- * Returns a Cell by grid coordinates
- *
- * @param x
- * @param y
- * @returns Cell
- */
-Grid.prototype.getCell = function(x, y) {
-    var cell = new Cell(0, 0, false);
-
-    if (!(x < 0 || y < 0 || x >= this.width || y >= this.height))
-        cell = this.matrix[x][y];
-
-    return cell;
-};
-
-/**
- * Returns neighboring cells by given grid coordinates
- *
- * @param x
- * @param y
- * @returns {{topLeft: Cell, top: Cell, topRight: Cell, right: Cell, bottomRight: Cell, bottom: Cell, bottomLeft: Cell, left: Cell}}
- */
-Grid.prototype.getNeighbors = function(x, y) {
-    return {
-        topLeft         : this.getCell(x-1,   y-1),
-        top             : this.getCell(x,     y-1),
-        topRight        : this.getCell(x+1,   y-1),
-        right           : this.getCell(x+1,   y),
-        bottomRight     : this.getCell(x+1,   y+1),
-        bottom          : this.getCell(x,     y+1),
-        bottomLeft      : this.getCell(x-1,   y+1),
-        left            : this.getCell(x-1,   y)
-    };
-};
-
-/**
- *
- * @param cell
- */
-Grid.prototype.countNeighbors = function(cell) {
-    var neighbors = this.getNeighbors(cell.x, cell.y);
-
-    var count = 0;
-
-    if(neighbors.top.value)
-        count++;
-    if(neighbors.bottom.value)
-        count++;
-    if(neighbors.left.value)
-        count++;
-    if(neighbors.right.value)
-        count++;
-    if(neighbors.topLeft.value)
-        count++;
-    if(neighbors.topRight.value)
-        count++;
-    if(neighbors.bottomLeft.value)
-        count++;
-    if(neighbors.bottomRight.value)
-        count++;
-
-    return count;
-};
-
-/**
- *
- * CONWAY FUNCTIONS
- *
- */
-
-/**
- * Checks if a cell will die in the next generation
- *
- * @param cell
- * @returns {*|boolean}
- */
-Grid.prototype.cellDies = function(cell) {
-    var neighborCount = this.countNeighbors(cell);
-    return cell.value && (neighborCount > 3 || neighborCount < 2);
-};
-
-/**
- * Check if cell will come alive in the next generation
- *
- * @param cell
- * @returns {boolean}
- */
-Grid.prototype.cellIsBorn = function(cell) {
-    var neighborCount = this.countNeighbors(cell);
-    return (!cell.value) && neighborCount == 3;
-};
-
-/**
- *
- * @returns {Grid}
- */
-Grid.prototype.executeConway = function() {
-    var nextGen = $.extend(true, {}, this);
-
-    var width = this.width;
-    var height = this.height;
-
-    for(var x = 0; x < width; x++) {
-        for(var y = 0; y < height; y++) {
-            var oldCell = this.getCell(x, y);
-            var newCell = nextGen.getCell(x, y);
-
-            if(!oldCell.value === true) {
-                if(this.cellIsBorn(oldCell))
-                    newCell.value = true;
-            }
-            else if(oldCell.value === true) {
-                newCell.value = !this.cellDies(oldCell);
+var Grid = (function () {
+    /**
+     * The constructor
+     *
+     * @param width
+     * @param height
+     */
+    function Grid(width, height) {
+        this.width = width;
+        this.height = height;
+        this.matrix = [];
+        for (var column = 0; column < width; column++) {
+            this.matrix[column] = [];
+            for (var line = 0; line < height; line++) {
+                var coords = new Vector2D(column, line);
+                this.matrix[column][line] = new Cell(coords, false);
             }
         }
     }
-
-    return nextGen;
-};;;(function ($, window, document, undefined) {
-
-    /*global jQuery, document, window, setInterval, clearInterval*/
-
-    'use strict';
-
-    var pluginName = 'conway';
-
-    var _default = {};
-
-    _default.settings = {
-        injectStyle: true,
-
-        gridColor: '#000',
-        gridLineWidth: 1,
-
-        hCells: 32,
-        vCells: 24,
-
-        borderColor: '#000',
-        borderStyle: 'none',
-        borderWidth: '4px',
-        borderRadius: '0px',
-
-        background: 'none',
-
-        font: '12px Arial'
+    /**
+     * Returns a Cell by coordinates
+     *
+     * @param coords
+     * @returns {Cell}
+     */
+    Grid.prototype.getCell = function (coords) {
+        var x = coords.x;
+        var y = coords.y;
+        var cell = new Cell(coords, false);
+        if (!(x < 0 || y < 0 || x >= this.width || y >= this.height))
+            cell = this.matrix[x][y];
+        return cell;
     };
-
-    var Conway = function (element, options) {
-
-        this.element = element;
-        this.$element = $(element);
-        this.elementId = element.id;
-        this.styleId = this.elementId + '-style';
-
-        this.ctx = this.element.getContext('2d');
-        this.radius = this.element.height > this.element.width ? this.element.width : this.element.height;
-        this.executing = false;
-
-        this.init(options);
-
-        return {
-            // Options (public access)
-            options: this.options,
-
-            // Initialize / destroy methods
-            init: $.proxy(this.init, this),
-            remove: $.proxy(this.remove, this),
-
-            // start/stop methods
-            start: $.proxy(this.start, this),
-            stop: $.proxy(this.stop, this),
-            toggleRunning: $.proxy(this.toggleRunning, this),
-            execute: $.proxy(this.execute, this),
-            toggleExecution: $.proxy(this.toggleExecution, this)
-        };
+    /**
+     * Returns the neighbor cells surrounding the given cell
+     *
+     * @param cell
+     * @returns {NeighborCells}
+     */
+    Grid.prototype.getNeighbors = function (cell) {
+        var neighborCoords = new NeighborCoordinates(cell);
+        var neighborCells = new NeighborCells();
+        neighborCells.topLeft = this.getCell(neighborCoords.topLeft);
+        neighborCells.top = this.getCell(neighborCoords.top);
+        neighborCells.topRight = this.getCell(neighborCoords.topRight);
+        neighborCells.right = this.getCell(neighborCoords.right);
+        neighborCells.bottomRight = this.getCell(neighborCoords.bottomRight);
+        neighborCells.bottom = this.getCell(neighborCoords.bottom);
+        neighborCells.bottomLeft = this.getCell(neighborCoords.bottomLeft);
+        neighborCells.left = this.getCell(neighborCoords.left);
+        return neighborCells;
     };
-
-    Conway.prototype.init = function(options) {
-        this.options = $.extend({}, _default.settings, options);
-
-        this.destroy();
-        this.grid = new Grid(this.options.hCells, this.options.vCells);
-        this.injectStyle();
-        this.render();
-        this.addListeners();
-        this.start();
-
-        this.initialized = true;
-    };
-
-    Conway.prototype.toggleExecution = function(){
-        this.executing = !this.executing;
-    };
-
-    Conway.prototype.toggleRunning = function() {
-        if (this.running) this.stop(); else this.start();
-    };
-
-    Conway.prototype.stop = function() {
-        if(this.running) {
-            clearInterval(this.interval);
-            this.running = false;
-        }
-    };
-
-    Conway.prototype.start = function() {
-        if(!this.running) {
-            var conway = this;
-            this.interval = setInterval(function() {
-                conway.render();
-            }, 100);
-            this.running = true;
-        }
-    };
-
-    Conway.prototype.render = function() {
-
-        // set size to minimum of width/height
-        var size = this.radius;
-
-        var width = this.element.width;
-        var height = this.element.height;
-
-        this.ctx.clearRect(0, 0, width, height);  // clears rectangle after each move
-
-        if(this.executing)
-            this.execute();
-
-        this.drawGrid(this.options.hCells, this.options.vCells, this.options.gridLineWidth, this.options.gridColor);
-
-        this.drawBoolMatrix(this.grid.matrix);
-    };
-
+    return Grid;
+})();
+//# sourceMappingURL=Grid.js.map
+;
+///<reference path="../Canvas/Canvas.ts"/>
+///<reference path="Grid.ts"/>
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var GridCanvas = (function (_super) {
+    __extends(GridCanvas, _super);
     /**
      *
-     * @param e
-     * @returns {{x: (number|*), y: (number|*)}}
-     */
-    Conway.prototype.getMouse = function(e) {
-        var offset = this.$element.offset();
-        var mx = e.pageX - offset.left;
-        var my = e.pageY - offset.top;
-
-        // We return a simple javascript object (a hash) with x and y defined
-        return {x: mx, y: my};
-    };
-
-    /**
-     * Maps DOM coordinates to grid coordinates
      *
-     * @param x
-     * @param y
-     * @returns {{x: number, y: number}}
-     */
-    Conway.prototype.getCellByCoords = function(x, y) {
-        var cellX = Math.floor(x / this.element.width * this.options.hCells);
-        var cellY = Math.floor(y / this.element.height * this.options.vCells);
-
-        return {x: cellX, y: cellY};
-    };
-
-    /**
-     * Executes the conway algorithm
-     */
-    Conway.prototype.execute = function() {
-        this.grid = this.grid.executeConway();
-    };
-
-    Conway.prototype.addListeners = function() {
-        var _this = this;
-        this.element.addEventListener('mousedown', function(e) {
-            var mouse = _this.getMouse(e);
-            var cell = _this.getCellByCoords(mouse.x, mouse.y);
-            _this.grid.toggleCell(cell.x, cell.y);
-        });
-    };
-
-    Conway.prototype.drawBoolMatrix = function(matrix) {
-        for(var x = 0; x < matrix.length; x++) {
-            for(var y = 0; y < matrix[x].length; y++) {
-                if(matrix[x][y].value)
-                    this.fillCell(x, y);
-            }
-        }
-    };
-
-    Conway.prototype.getRandomBoolMatrix = function(width, height) {
-
-        var matrix = [];
-        for(var x = 0; x < width; x++) {
-            matrix[x] = [];
-            for(var y = 0; y < height; y++) {
-                matrix[x][y] = this.getRandomBool();
-            }
-        }
-
-        return matrix;
-    };
-
-    /**
-     * Returns a random boolean
-     *
-     * @returns {boolean}
-     */
-    Conway.prototype.getRandomBool = function() {
-        return Math.random() < 0.5;
-    };
-
-    /**
-     * Draws a grid across the entire canvas
-     *
+     * @param element
      * @param hCells
      * @param vCells
-     * @param lineWidth
-     * @param color
      */
-    Conway.prototype.drawGrid = function(hCells, vCells, lineWidth, color) {
+    function GridCanvas(element, hCells, vCells) {
+        _super.call(this, element);
+        this.grid = new Grid(hCells, vCells);
+        this.showGrid = true;
+        this.addEventListeners();
+        this.start();
+    }
+    /**
+     * Toggle showing the grid
+     */
+    GridCanvas.prototype.toggleShowGrid = function () {
+        this.showGrid = !this.showGrid;
+    };
+    GridCanvas.prototype.drawGrid = function () {
         var width = this.element.width;
         var height = this.element.height;
-
-        var hSpacing = width / hCells;
-        var vSpacing = height / vCells;
-
-        for(var hLine = 0; hLine <= hCells; hLine++) {
+        var hSpacing = width / this.grid.width;
+        var vSpacing = height / this.grid.height;
+        for (var hLine = 0; hLine <= this.grid.width; hLine++) {
             var x = hLine * hSpacing;
-            this.drawVerticalLine(x, lineWidth, color);
+            this.drawVerticalLine(x, this.lineWidth, this.gridColor);
         }
-
-        for(var vLine = 0; vLine <= vCells; vLine++) {
+        for (var vLine = 0; vLine <= this.grid.height; vLine++) {
             var y = vLine * vSpacing;
-            this.drawHorizontalLine(y, lineWidth, color);
+            this.drawHorizontalLine(y, this.lineWidth, this.gridColor);
         }
     };
-
-    /**
-     * Draws a horizontal line across the entire width of the canvas
-     *
-     * @param y
-     * @param lineWidth
-     * @param color
-     */
-    Conway.prototype.drawHorizontalLine = function(y, lineWidth, color) {
-        var width = this.element.width;
-
-        this.ctx.save();
-            this.ctx.strokeStyle = color;
-            this.ctx.fillStyle = color;
-            this.ctx.lineWidth = lineWidth;
-            this.ctx.beginPath();
-            this.ctx.moveTo(0, y);
-            this.ctx.lineTo(width, y);
-            this.ctx.stroke();
-        this.ctx.restore();
-    };
-
-    /**
-     * Draws a vertical line across the entire height of the canvas
-     *
-     * @param x
-     * @param lineWidth
-     * @param color
-     */
-    Conway.prototype.drawVerticalLine = function(x, lineWidth, color) {
-
+    GridCanvas.prototype.drawVerticalLine = function (x, lineWidth, color) {
         var height = this.element.height;
-
         this.ctx.save();
-            this.ctx.strokeStyle = color;
-            this.ctx.fillStyle = color;
-            this.ctx.lineWidth = lineWidth;
-            this.ctx.beginPath();
-            this.ctx.moveTo(x, 0);
-            this.ctx.lineTo(x, height);
-            this.ctx.stroke();
-        this.ctx.restore();
-    };
-
-    Conway.prototype.fillCell = function(x, y) {
-        var cellWidth = this.element.width / this.options.hCells;
-        var cellHeight = this.element.height / this.options.vCells;
-
-        var xPos = x * cellWidth;
-        var yPos = y * cellHeight;
-
-        this.ctx.save();
-            this.ctx.fillRect(xPos, yPos, cellWidth, cellHeight);
-        this.ctx.restore();
-    };
-
-    Conway.prototype.radialLineAtAngle = function(angleFraction, highlight) {
-        this.ctx.save();
-        this.ctx.translate(this.element.width/2, this.element.height/2);
-        this.ctx.rotate(Math.PI * (2.0 * angleFraction - 0.5));
-
-        if(highlight) {
-            this.ctx.lineWidth = this.options.highlightTickWidth;
-            this.ctx.strokeStyle = this.options.highlightTickColor;
-        }
-        else {
-            this.ctx.lineWidth = this.options.tickWidth;
-            this.ctx.strokeStyle = this.options.tickColor;
-        }
-
+        this.ctx.strokeStyle = color;
+        this.ctx.fillStyle = color;
+        this.ctx.lineWidth = lineWidth;
         this.ctx.beginPath();
-        this.ctx.moveTo(0,this.radius-130);
-        this.ctx.lineTo(0,this.radius-125);
+        this.ctx.moveTo(x, 0);
+        this.ctx.lineTo(x, height);
         this.ctx.stroke();
         this.ctx.restore();
     };
-
-    // Add inline style into head
-    Conway.prototype.injectStyle = function () {
-        if (this.options.injectStyle && !document.getElementById(this.styleId)) {
-            $('<style type="text/css" id="' + this.styleId + '"> ' + this.buildStyle() + ' </style>').appendTo('head');
-        }
+    GridCanvas.prototype.drawHorizontalLine = function (y, lineWidth, color) {
+        var width = this.element.width;
+        this.ctx.save();
+        this.ctx.strokeStyle = color;
+        this.ctx.fillStyle = color;
+        this.ctx.lineWidth = lineWidth;
+        this.ctx.beginPath();
+        this.ctx.moveTo(0, y);
+        this.ctx.lineTo(width, y);
+        this.ctx.stroke();
+        this.ctx.restore();
     };
-
-    // Construct conway style based on user options
-    Conway.prototype.buildStyle = function () {
-
-        var style = '#' + this.elementId + '{';
-
-        if (this.options.background) {
-            style += 'background:' + this.options.background + ';';
-        }
-
-        if (this.options.borderColor && this.options.borderStyle && this.options.borderWidth) {
-            style += 'border: ' + this.options.borderWidth + ' ' + this.options.borderStyle + ' ' + this.options.borderColor + ';';
-        }
-
-        if (this.options.borderRadius) {
-            style += 'border-radius: ' + this.options.borderRadius + ';';
-        }
-
-        style += '}';
-
-        return style;
+    GridCanvas.prototype.fillCellAtCoords = function (coords) {
+        var cellWidth = this.element.width / this.grid.width;
+        var cellHeight = this.element.height / this.grid.height;
+        var xPos = coords.x * cellWidth;
+        var yPos = coords.y * cellHeight;
+        this.ctx.save();
+        this.ctx.fillRect(xPos, yPos, cellWidth, cellHeight);
+        this.ctx.restore();
     };
-
-    Conway.prototype.destroy = function() {
-        if (!this.initialized) return;
-
-        this.stop();
-
-        // Reset this.initialized flag
-        this.initialized = false;
-    };
-
-    Conway.prototype.remove = function() {
-        this.destroy();
-        $.removeData(this, pluginName);
-        $('#' + this.styleId).remove();
-    };
-
-    var logError = function (message) {
-        if (window.console) {
-            window.console.error(message);
-        }
-    };
-
-    // Prevent against multiple instantiations,
-    // handle updates and method calls
-    $.fn[pluginName] = function (options, args) {
-
-        var result;
-
-        this.each(function () {
-            var _this = $.data(this, pluginName);
-            if (typeof options === 'string') {
-                if (!_this) {
-                    logError('Not initialized, can not call method : ' + options);
-                }
-                else if (!$.isFunction(_this[options]) || options.charAt(0) === '_') {
-                    logError('No such method : ' + options);
-                }
-                else {
-                    if (!(args instanceof Array)) {
-                        args = [ args ];
-                    }
-                    result = _this[options].apply(_this, args);
+    GridCanvas.prototype.drawGridMatrix = function () {
+        var matrix = this.grid.matrix;
+        for (var x = 0; x < matrix.length; x++) {
+            for (var y = 0; y < matrix[x].length; y++) {
+                if (matrix[x][y].value) {
+                    var coords = new Vector2D(x, y);
+                    this.fillCellAtCoords(coords);
                 }
             }
-            else if (typeof options === 'boolean') {
-                result = _this;
-            }
-            else {
-                $.data(this, pluginName, new Conway(this, $.extend(true, {}, options)));
-            }
+        }
+    };
+    /**
+     * Convert canvas coordinates to grid coordinates
+     *
+     * @param canvasCoords
+     * @returns {Vector2D}
+     */
+    GridCanvas.prototype.canvasToGridCoords = function (canvasCoords) {
+        var x = canvasCoords.x;
+        var y = canvasCoords.y;
+        var cellX = Math.floor(x / this.element.width * this.grid.width);
+        var cellY = Math.floor(y / this.element.height * this.grid.height);
+        return new Vector2D(cellX, cellY);
+    };
+    /**
+     * Adds event listeners to the DOM element
+     */
+    GridCanvas.prototype.addEventListeners = function () {
+        var _this = this;
+        this.element.addEventListener('mousedown', function (e) {
+            var canvasCoords = _this.getMouse(e);
+            var gridCoords = _this.canvasToGridCoords(canvasCoords);
+            var cell = _this.grid.getCell(gridCoords);
+            cell.toggleValue();
         });
-
-        return result || this;
     };
-
-})(jQuery, window, document);
+    GridCanvas.prototype.render = function () {
+        _super.prototype.clear.call(this);
+        if (this.showGrid) {
+            this.drawGrid();
+        }
+        this.drawGridMatrix();
+    };
+    return GridCanvas;
+})(Canvas);
+//# sourceMappingURL=GridCanvas.js.map
+;
+///<reference path="Cell.ts"/>
+var NeighborCells = (function () {
+    /**
+     * The constructor
+     */
+    function NeighborCells() {
+        // no-op
+    }
+    return NeighborCells;
+})();
+//# sourceMappingURL=NeighborCells.js.map
+;
+///<reference path="Cell.ts"/>
+var NeighborCoordinates = (function () {
+    function NeighborCoordinates(cell) {
+        this.topLeft = cell.getCoordsTopLeft();
+        this.top = cell.getCoordsTop();
+        this.topRight = cell.getCoordsTopRight();
+        this.right = cell.getCoordsRight();
+        this.bottomRight = cell.getCoordsBottomRight();
+        this.bottom = cell.getCoordsBottom();
+        this.bottomLeft = cell.getCoordsBottomLeft();
+        this.left = cell.getCoordsLeft();
+    }
+    return NeighborCoordinates;
+})();
+//# sourceMappingURL=NeighborCoordinates.js.map
+;
+///<reference path="../Grid/GridCanvas.ts"/>
+///<reference path="ConwayGrid.ts"/>
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var ConwayCanvas = (function (_super) {
+    __extends(ConwayCanvas, _super);
+    /**
+     * Constructor
+     *
+     * @param element
+     * @param hCells
+     * @param vCells
+     */
+    function ConwayCanvas(element, hCells, vCells) {
+        _super.call(this, element, hCells, vCells);
+        this.grid = new ConwayGrid(hCells, vCells);
+        this.executing = false;
+    }
+    /**
+     * Toggle conway game of life algorithm execution
+     */
+    ConwayCanvas.prototype.toggleExecution = function () {
+        this.executing = !this.executing;
+    };
+    /**
+     * Render method
+     */
+    ConwayCanvas.prototype.render = function () {
+        _super.prototype.render.call(this);
+        if (this.executing) {
+            this.grid = this.grid.executeConway();
+        }
+    };
+    return ConwayCanvas;
+})(GridCanvas);
+//# sourceMappingURL=ConwayCanvas.js.map
+;
+///<reference path="../Grid/Grid.ts"/>
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var ConwayGrid = (function (_super) {
+    __extends(ConwayGrid, _super);
+    /**
+     * Constructor
+     *
+     * @param width
+     * @param height
+     */
+    function ConwayGrid(width, height) {
+        _super.call(this, width, height);
+    }
+    /**
+     * Counts the live cells surrounding the given Cell
+     *
+     * @param cell
+     * @returns {number}
+     */
+    ConwayGrid.prototype.countLiveNeighbors = function (cell) {
+        var neighbors = this.getNeighbors(cell);
+        var count = 0;
+        if (neighbors.top.value)
+            count++;
+        if (neighbors.bottom.value)
+            count++;
+        if (neighbors.left.value)
+            count++;
+        if (neighbors.right.value)
+            count++;
+        if (neighbors.topLeft.value)
+            count++;
+        if (neighbors.topRight.value)
+            count++;
+        if (neighbors.bottomLeft.value)
+            count++;
+        if (neighbors.bottomRight.value)
+            count++;
+        return count;
+    };
+    /**
+     * Determines whether or not the given cell will survive in the next generation
+     *
+     * @param cell
+     * @returns {boolean}
+     */
+    ConwayGrid.prototype.livesInNextGeneration = function (cell) {
+        var neighborCount = this.countLiveNeighbors(cell);
+        // Any live cell with fewer than two live neighbours dies, as if caused by under-population.
+        if (cell.value === true
+            && neighborCount < 2) {
+            return false;
+        }
+        // Any live cell with two or three live neighbours lives on to the next generation.
+        if (cell.value === true
+            && neighborCount < 4
+            && neighborCount > 1) {
+            return true;
+        }
+        // Any live cell with more than three live neighbours dies, as if by over-population.
+        if (cell.value === true
+            && neighborCount > 3) {
+            return false;
+        }
+        // Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
+        if (cell.value === false
+            && neighborCount === 3) {
+            return true;
+        }
+        return false;
+    };
+    /**
+     * Executes one step of the Conway Game Of Life Algorithm
+     *
+     * @returns {ConwayGrid}
+     */
+    ConwayGrid.prototype.executeConway = function () {
+        var nextGen = new ConwayGrid(this.width, this.height);
+        var width = this.width;
+        var height = this.height;
+        for (var x = 0; x < width; x++) {
+            for (var y = 0; y < height; y++) {
+                var coords = new Vector2D(x, y);
+                var oldCell = this.getCell(coords);
+                var newCell = nextGen.getCell(coords);
+                newCell.value = this.livesInNextGeneration(oldCell);
+            }
+        }
+        return nextGen;
+    };
+    return ConwayGrid;
+})(Grid);
+//# sourceMappingURL=ConwayGrid.js.map
