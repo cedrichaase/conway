@@ -1,4 +1,4 @@
-///<reference path="Vector2D.ts"/>
+///<reference path="../Vector/Vector2D.ts"/>
 /// <reference path="../../../vendor/jquery.d.ts" />
 
 abstract class Canvas {

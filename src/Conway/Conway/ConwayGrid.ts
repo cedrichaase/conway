@@ -1,6 +1,12 @@
 ///<reference path="../Grid/Grid.ts"/>
+///<reference path="ConwayCell.ts"/>
 
 class ConwayGrid extends Grid {
+
+    /**
+     * The Grid Cell matrix
+     */
+    public matrix: Array<Array<ConwayCell>>;
 
     /**
      * Constructor
@@ -10,6 +16,14 @@ class ConwayGrid extends Grid {
      */
     public constructor(width: number, height: number) {
         super(width, height);
+
+        for(var column = 0; column < width; column++) {
+            this.matrix[column] = [];
+            for(var line = 0; line < height; line++) {
+                var coords = new Vector2D(column, line);
+                this.matrix[column][line] = new ConwayCell(coords, false);
+            }
+        }
     }
 
     /**
@@ -18,7 +32,7 @@ class ConwayGrid extends Grid {
      * @param cell
      * @returns {number}
      */
-    private countLiveNeighbors(cell: Cell) {
+    private countLiveNeighbors(cell: ConwayCell) {
         var neighbors = this.getNeighbors(cell);
 
         var count = 0;
@@ -49,30 +63,30 @@ class ConwayGrid extends Grid {
      * @param cell
      * @returns {boolean}
      */
-    private livesInNextGeneration(cell: Cell) {
+    private livesInNextGeneration(cell: ConwayCell) {
         var neighborCount = this.countLiveNeighbors(cell);
 
         // Any live cell with fewer than two live neighbours dies, as if caused by under-population.
-        if(cell.value === true
+        if(cell.isAlive()
             && neighborCount < 2) {
             return false;
         }
 
         // Any live cell with two or three live neighbours lives on to the next generation.
-        if(cell.value === true
+        if(cell.isAlive()
             && neighborCount < 4
             && neighborCount > 1) {
             return true;
         }
 
         // Any live cell with more than three live neighbours dies, as if by over-population.
-        if(cell.value === true
+        if(cell.isAlive()
             && neighborCount > 3) {
             return false;
         }
 
         // Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
-        if(cell.value === false
+        if(!cell.isAlive()
             && neighborCount === 3) {
             return true;
         }
@@ -102,5 +116,23 @@ class ConwayGrid extends Grid {
         }
 
         return nextGen;
+    }
+
+    /**
+     * Returns a Cell by coordinates
+     *
+     * @param coords
+     * @returns {ConwayCell}
+     */
+    public getCell(coords: Vector2D) {
+        var x = coords.x;
+        var y = coords.y;
+
+        var cell = new ConwayCell(coords, false);
+
+        if (!(x < 0 || y < 0 || x >= this.width || y >= this.height))
+            cell = this.matrix[x][y];
+
+        return cell;
     }
 }

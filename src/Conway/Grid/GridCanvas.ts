@@ -145,7 +145,7 @@ class GridCanvas extends Canvas {
             var canvasCoords = _this.getMouse(e);
             var gridCoords = _this.canvasToGridCoords(canvasCoords);
             var cell = _this.grid.getCell(gridCoords);
-            cell.toggleValue();
+            cell.click();
         });
     }
 

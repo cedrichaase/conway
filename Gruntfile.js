@@ -22,7 +22,14 @@ module.exports = function(grunt) {
         separator: grunt.util.linefeed + ';' + grunt.util.linefeed
       },
       dist: {
-        src: ['src/Conway/Canvas/*.js', 'src/Conway/Grid/*.js', 'src/Conway/Conway/*.js'],
+        src: [
+          'src/Conway/Vector/*.js',
+          'src/Conway/Cell/Behavior/*.js',
+          'src/Conway/Cell/*.js',
+          'src/Conway/Canvas/*.js',
+          'src/Conway/Grid/*.js',
+          'src/Conway/Conway/*.js'
+        ],
         dest: 'src/conway.js'
       }
     },

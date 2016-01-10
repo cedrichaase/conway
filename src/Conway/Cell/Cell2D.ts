@@ -1,15 +1,16 @@
 /// <reference path="../../../vendor/jquery.d.ts" />
-///<reference path="Grid.ts"/>
+///<reference path="Cell.ts"/>
+///<reference path="../Vector/Vector2D.ts"/>
 
 /**
  * Class Cell
  */
-class Cell {
+class Cell2D extends Cell {
 
     /**
      * The cell value
      */
-    public value: boolean;
+    public value: any;
 
     /**
      * The cell coordinates
@@ -22,16 +23,8 @@ class Cell {
      * @param coords
      * @param value
      */
-    constructor(coords: Vector2D, value: boolean) {
-        this.coords = coords;
-        this.value = value;
-    }
-
-    /**
-     * Toggles the cell value
-     */
-    toggleValue(): void {
-        this.value = !this.value;
+    constructor(coords: Vector2D, value: any) {
+        super(coords, value);
     }
 
     /**
@@ -39,7 +32,7 @@ class Cell {
      *
      * @returns {Vector2D}
      */
-    getCoordsTopLeft() {
+    public getCoordsTopLeft() {
         return new Vector2D(this.coords.x - 1, this.coords.y - 1);
     }
 

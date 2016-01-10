@@ -1,4 +1,5 @@
-///<reference path="Cell.ts"/>
+///<reference path="../Vector/Vector2D.ts"/>
+///<reference path="../Cell/Cell2D.ts"/>
 
 class NeighborCoordinates {
 
@@ -18,7 +19,7 @@ class NeighborCoordinates {
 
     public left: Vector2D;
 
-    constructor(cell: Cell) {
+    constructor(cell: Cell2D) {
         this.topLeft        = cell.getCoordsTopLeft();
         this.top            = cell.getCoordsTop();
         this.topRight       = cell.getCoordsTopRight();

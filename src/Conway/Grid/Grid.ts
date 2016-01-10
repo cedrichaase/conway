@@ -1,6 +1,6 @@
 /// <reference path="../../../vendor/jquery.d.ts" />
-/// <reference path="Cell.ts" />
-///<reference path="../Canvas/Vector2D.ts"/>
+/// <reference path="../Cell/Cell2D.ts" />
+///<reference path="../Vector/Vector2D.ts"/>
 ///<reference path="NeighborCoordinates.ts"/>
 ///<reference path="NeighborCells.ts"/>
 
@@ -28,7 +28,7 @@ class Grid {
     /**
      * The Grid Cell matrix
      */
-    public matrix: Array<Array<Cell>>;
+    public matrix: Array<Array<Cell2D>>;
 
     /**
      * The constructor
@@ -36,7 +36,7 @@ class Grid {
      * @param width
      * @param height
      */
-    constructor(width, height) {
+    public constructor(width, height) {
 
         this.width = width;
         this.height = height;
@@ -46,7 +46,7 @@ class Grid {
             this.matrix[column] = [];
             for(var line = 0; line < height; line++) {
                 var coords = new Vector2D(column, line);
-                this.matrix[column][line] = new Cell(coords, false);
+                this.matrix[column][line] = new Cell2D(coords, false);
             }
         }
     }
@@ -56,13 +56,13 @@ class Grid {
      * Returns a Cell by coordinates
      *
      * @param coords
-     * @returns {Cell}
+     * @returns {Cell2D}
      */
-    getCell(coords: Vector2D): Cell {
+    public getCell(coords: Vector2D) {
         var x = coords.x;
         var y = coords.y;
 
-        var cell = new Cell(coords, false);
+        var cell = new Cell2D(coords, false);
 
         if (!(x < 0 || y < 0 || x >= this.width || y >= this.height))
             cell = this.matrix[x][y];
@@ -76,7 +76,7 @@ class Grid {
      * @param cell
      * @returns {NeighborCells}
      */
-    getNeighbors(cell: Cell) {
+    public getNeighbors(cell: Cell2D) {
         var neighborCoords  = new NeighborCoordinates(cell);
         var neighborCells   = new NeighborCells();
 

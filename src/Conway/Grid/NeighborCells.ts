@@ -1,22 +1,22 @@
-///<reference path="Cell.ts"/>
+///<reference path="../Cell/Cell2D.ts"/>
 
 class NeighborCells {
 
-    public topLeft: Cell;
+    public topLeft: Cell2D;
 
-    public top: Cell;
+    public top: Cell2D;
 
-    public topRight: Cell;
+    public topRight: Cell2D;
 
-    public right: Cell;
+    public right: Cell2D;
 
-    public bottomRight: Cell;
+    public bottomRight: Cell2D;
 
-    public bottom: Cell;
+    public bottom: Cell2D;
 
-    public bottomLeft: Cell;
+    public bottomLeft: Cell2D;
 
-    public left: Cell;
+    public left: Cell2D;
 
     /**
      * The constructor
