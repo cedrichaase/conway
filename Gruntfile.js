@@ -29,7 +29,8 @@ module.exports = function(grunt) {
           'src/Conway/Cell/*.js',
           'src/Conway/Canvas/*.js',
           'src/Conway/Grid/*.js',
-          'src/Conway/Conway/*.js'
+          'src/Conway/Conway/*.js',
+          'src/Conway/ThreeView/*.js'
         ],
         dest: 'src/conway.js'
       }

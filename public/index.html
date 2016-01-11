@@ -5,47 +5,57 @@
     <link href="./css/conway.css" rel="stylesheet">
   </head>
   <body>
-    <div class="canvas-container">
-      <canvas id="canvas1" width="1024" height="768"></canvas>
-      <br/>
-      <button id="toggleExec">Toggle execution</button>
-      <label id="refreshRateLabel" for="refreshRate">Refresh rate</label>
-      <input id="refreshRate" name="refreshRate" type="range"/>
-      <!--<button onclick="$('#canvas1').conway('toggleGrid')">Toggle grid</button>-->
-      <!--<input name="color" id="color" type="color" value="#000000">-->
-    </div>
+    <!--<div class="canvas-container">-->
+      <!--<canvas id="canvas1" width="1024" height="768"></canvas>-->
+      <!--<br/>-->
+      <!--<button id="toggleExec">Toggle execution</button>-->
+      <!--<label id="refreshRateLabel" for="refreshRate">Refresh rate</label>-->
+      <!--<input id="refreshRate" name="refreshRate" type="range"/>-->
+      <!--&lt;!&ndash;<button onclick="$('#canvas1').conway('toggleGrid')">Toggle grid</button>&ndash;&gt;-->
+      <!--&lt;!&ndash;<input name="color" id="color" type="color" value="#000000">&ndash;&gt;-->
+    <!--</div>-->
+
+    <div id="fov"></div>
 
     <script src="./bower_components/jquery/dist/jquery.js"></script>
+    <script src="./bower_components/three.js/build/three.js"></script>
+    <script src="./bower_components/three.js/examples/js/renderers/CanvasRenderer.js"></script>
+    <script src="./bower_components/three.js/examples/js/renderers/Projector.js"></script>
   	<script src="./js/conway.js"></script>
   	<script type="text/javascript">
 
       $(function() {
-        var canvasElement = document.getElementById('canvas1');
-        var conwayCanvas = new ConwayCanvas(canvasElement, 256, 192);
-
-        var toggleExec = document.getElementById('toggleExec');
-        toggleExec.onclick = function(e) {
-          conwayCanvas.toggleExecution();
-        };
-
-//        var toggleGrid = document.getElementById('toggleGrid');
-//        toggleGrid.onclick = function(e) {
-//          conwayCanvas.toggleShowGrid();
+//        var canvasElement = document.getElementById('canvas1');
+//        var conwayCanvas = new ConwayCanvas(canvasElement, 256, 192);
+//
+//        var toggleExec = document.getElementById('toggleExec');
+//        toggleExec.onclick = function(e) {
+//          conwayCanvas.toggleExecution();
 //        };
-
-        var refreshRate = $('#refreshRate');
-        var refreshRateLabel = $('#refreshRateLabel');
-        refreshRate.change(function(e) {
-          var rate = refreshRate.val() * 10;
-
-          conwayCanvas.setRenderInterval(rate);
-          refreshRateLabel.html('Refresh rate: ' + rate + 'ms');
-        });
+//
+////        var toggleGrid = document.getElementById('toggleGrid');
+////        toggleGrid.onclick = function(e) {
+////          conwayCanvas.toggleShowGrid();
+////        };
+//
+//        var refreshRate = $('#refreshRate');
+//        var refreshRateLabel = $('#refreshRateLabel');
+//        refreshRate.change(function(e) {
+//          var rate = refreshRate.val() * 10;
+//
+//          conwayCanvas.setRenderInterval(rate);
+//          refreshRateLabel.html('Refresh rate: ' + rate + 'ms');
+//        });
 
 //        slider.on('change', function(e){
 //          var color = slider.val();
 //          canvas.conway('setGridColor', {gridColor: color});
 //        });
+
+        threeView = new ThreeView();
+        threeView.setOrthographic();
+
+
       });
 
   	</script>
