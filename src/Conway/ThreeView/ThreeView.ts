@@ -15,11 +15,10 @@ class ThreeView {
 
     public lookAtScene: boolean;
 
-    public constructor() {
+    public constructor(element) {
         this.lookAtScene = true;
 
-        this.container = document.createElement('div');
-        document.body.appendChild(this.container);
+        this.container = element;
 
         this.camera = new CombinedCamera(window.innerWidth / 2, window.innerHeight / 2, 70, 1, 1000, - 500, 1000);
 
