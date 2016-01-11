@@ -119,23 +119,23 @@ class ThreeView {
 
     setFov(fov) {
         this.camera.setFov(fov);
-        document.getElementById('fov').innerHTML = 'FOV '+ fov.toFixed(2) +'&deg;';
+        console.log('FOV '+ fov.toFixed(2) +'&deg;');
     }
 
     setLens(lens) {
         // try adding a tween effect while changing focal length, and it'd be even cooler!
         var fov = this.camera.setLens(lens);
-        document.getElementById('fov').innerHTML = 'Converted ' + lens + 'mm lens to FOV '+ fov.toFixed(2) +'&deg;' ;
+        console.log('Converted ' + lens + 'mm lens to FOV '+ fov.toFixed(2) +'&deg;');
     }
 
     setOrthographic() {
         this.camera.toOrthographic();
-        document.getElementById('fov').innerHTML = 'Orthographic mode';
+        console.log('Orthographic mode');
     }
 
      setPerspective() {
         this.camera.toPerspective();
-        document.getElementById('fov').innerHTML = 'Perspective mode' ;
+        console.log('Perspective mode');
     }
 
     //init() {
