@@ -1,7 +1,7 @@
 ///<reference path="../Canvas/Canvas.ts"/>
 ///<reference path="Grid.ts"/>
 
-class GridCanvas extends Canvas {
+class GridCanvas extends Canvas implements Observer {
 
     /**
      * The grid data structure
@@ -16,12 +16,19 @@ class GridCanvas extends Canvas {
     /**
      * The grid color
      */
-    private gridColor: string;
+    private gridColor: string = '#000';
 
     /**
      * Show or show not? That is the question.
      */
-    private showGrid: boolean;
+    private gridNeedsRedraw: boolean;
+
+    /**
+     * padding
+     *
+     * @type {number}
+     */
+    private padding: number = 15.5;
 
     /**
      *
@@ -35,39 +42,44 @@ class GridCanvas extends Canvas {
 
         this.grid = new Grid(hCells, vCells);
 
-        this.showGrid = true;
+        for(var col of this.grid.matrix) {
+            for(var cell of col) {
+                cell.registerObserver(this);
+            }
+        }
+
+        this.gridNeedsRedraw = true;
 
         this.addEventListeners();
         this.start();
     }
 
-    /**
-     * Toggle showing the grid
-     */
-    public toggleShowGrid() {
-        this.showGrid = !this.showGrid;
-    }
-
     private drawGrid() {
-        var width = this.element.width;
-        var height = this.element.height;
+        var width = this.width;
+        var height = this.height;
 
         var hSpacing = width / this.grid.width;
         var vSpacing = height / this.grid.height;
 
-        for(var hLine = 0; hLine <= this.grid.width; hLine++) {
+        this.ctx.save();
+
+        this.ctx.translate(0.5, 0.5);
+
+        for(var hLine = 1; hLine <= this.grid.width; hLine++) {
             var x = hLine * hSpacing;
             this.drawVerticalLine(x, this.lineWidth, this.gridColor);
         }
 
-        for(var vLine = 0; vLine <= this.grid.height; vLine++) {
+        for(var vLine = 1; vLine <= this.grid.height; vLine++) {
             var y = vLine * vSpacing;
             this.drawHorizontalLine(y, this.lineWidth, this.gridColor);
         }
+
+        this.ctx.restore();
     }
 
     private drawVerticalLine(x, lineWidth, color) {
-        var height = this.element.height;
+        var height = this.height;
 
         this.ctx.save();
             this.ctx.strokeStyle = color;
@@ -81,7 +93,7 @@ class GridCanvas extends Canvas {
     }
 
     private drawHorizontalLine(y, lineWidth, color) {
-        var width = this.element.width;
+        var width = this.width;
 
         this.ctx.save();
             this.ctx.strokeStyle = color;
@@ -93,17 +105,61 @@ class GridCanvas extends Canvas {
             this.ctx.stroke();
         this.ctx.restore();
     }
-
-    private fillCellAtCoords(coords: Vector2D) {
-        var cellWidth = this.element.width / this.grid.width;
-        var cellHeight = this.element.height / this.grid.height;
+    /**
+     * Fill a Cell at given coords with given color
+     *
+     * @param coords
+     * @param color
+     */
+    private fillCellAtCoords(coords: Vector2D, color: string) {
+        var cellWidth = this.width / this.grid.width;
+        var cellHeight = this.height / this.grid.height;
 
         var xPos = coords.x * cellWidth;
         var yPos = coords.y * cellHeight;
 
         this.ctx.save();
+            this.ctx.fillStyle = color;
             this.ctx.fillRect(xPos, yPos, cellWidth, cellHeight);
         this.ctx.restore();
+    }
+
+    private clearCellAtCoords(coords: Vector2D) {
+        var bgcolor = '#FFF';
+
+        var cellWidth = this.width / this.grid.width;
+        var cellHeight = this.height / this.grid.height;
+
+        var xPos = coords.x * cellWidth;
+        var yPos = coords.y * cellHeight;
+
+        this.ctx.save();
+            this.ctx.fillStyle = this.gridColor;
+            this.ctx.fillRect(xPos, yPos, cellWidth, cellHeight);
+        this.ctx.restore();
+
+        this.ctx.save();
+            this.ctx.fillStyle = bgcolor;
+            this.ctx.fillRect(xPos + 1, yPos + 1, cellWidth - 1, cellHeight - 1);
+        this.ctx.restore();
+    }
+
+    /**
+     * Fill a cell at given coords
+     *
+     * @param coords
+     */
+    private fillCell(coords: Vector2D) {
+        this.fillCellAtCoords(coords, '#000');
+    }
+
+    /**
+     * Clear a cell at given coords
+     *
+     * @param coords
+     */
+    private clearCell(coords: Vector2D) {
+        this.fillCellAtCoords(coords, '#FFF');
     }
 
     private drawGridMatrix() {
@@ -113,7 +169,7 @@ class GridCanvas extends Canvas {
             for(var y = 0; y < matrix[x].length; y++) {
                 if(matrix[x][y].value) {
                     var coords = new Vector2D(x, y);
-                    this.fillCellAtCoords(coords);
+                    this.fillCell(coords);
                 }
             }
         }
@@ -129,8 +185,8 @@ class GridCanvas extends Canvas {
         var x = canvasCoords.x;
         var y = canvasCoords.y;
 
-        var cellX = Math.floor(x / this.element.width * this.grid.width);
-        var cellY = Math.floor(y / this.element.height * this.grid.height);
+        var cellX = Math.floor(x / this.width * this.grid.width);
+        var cellY = Math.floor(y / this.height * this.grid.height);
 
         return new Vector2D(cellX, cellY);
     }
@@ -146,14 +202,25 @@ class GridCanvas extends Canvas {
             var gridCoords = _this.canvasToGridCoords(canvasCoords);
             var cell = _this.grid.getCell(gridCoords);
             cell.click();
+            _this.update(cell);
         });
     }
 
     protected render() {
-        super.clear();
-        if(this.showGrid) {
+        if(this.gridNeedsRedraw) {
+            super.clear();
             this.drawGrid();
+            this.gridNeedsRedraw = false;
         }
-        this.drawGridMatrix();
+        //this.drawGridMatrix();
+    }
+
+    public update(cell: Cell2D): void {
+        if(cell.value) {
+            this.fillCell(cell.coords);
+        }
+        else {
+            this.clearCellAtCoords(cell.coords);
+        }
     }
 }

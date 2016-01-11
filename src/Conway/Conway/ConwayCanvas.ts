@@ -22,7 +22,7 @@ class ConwayCanvas extends GridCanvas {
      */
     public constructor(element: HTMLCanvasElement, hCells: number, vCells: number) {
         super(element, hCells, vCells);
-        this.grid = new ConwayGrid(hCells, vCells);
+        this.grid = new ConwayGrid(hCells, vCells, this);
         this.executing = false;
     }
 
@@ -42,5 +42,11 @@ class ConwayCanvas extends GridCanvas {
         if(this.executing) {
             this.grid = this.grid.executeConway();
         }
+    }
+
+    public setRenderInterval(interval: number) {
+        this.stop();
+        this.renderInterval = interval;
+        this.start();
     }
 }

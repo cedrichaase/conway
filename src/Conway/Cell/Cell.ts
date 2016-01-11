@@ -1,11 +1,13 @@
 /// <reference path="../../../vendor/jquery.d.ts" />
 ///<reference path="../Vector/Vector.ts"/>
+///<reference path="../Observer/Observable.ts"/>
+///<reference path="../Observer/Observer.ts"/>
 ///<reference path="Behavior/ClickBehavior.ts"/>
 
 /**
  * Class Cell
  */
-abstract class Cell {
+abstract class Cell implements Observable {
 
     /**
      * The cell value
@@ -23,6 +25,11 @@ abstract class Cell {
     public clickBehavior: ClickBehavior;
 
     /**
+     * Registered observers
+     */
+    private observers: Array<Observer>;
+
+    /**
      * The constructor
      *
      * @param coords
@@ -31,6 +38,7 @@ abstract class Cell {
     constructor(coords: Vector, value: boolean) {
         this.coords = coords;
         this.value = value;
+        this.observers = [];
     }
 
     /**
@@ -40,4 +48,41 @@ abstract class Cell {
         this.clickBehavior.click(this);
     }
 
+    /**
+     * Register an observer
+     *
+     * @param observer
+     */
+    public registerObserver(observer: Observer): void {
+        this.observers.push(observer);
+    }
+
+    /**
+     * Un-register an observer
+     *
+     * @param observer
+     */
+    public removeObserver(observer: Observer): void {
+        // TODO: implement
+        return;
+    }
+
+    /**
+     * Publish state to observers
+     */
+    public publish(): void {
+        for(var observer of this.observers) {
+            observer.update(this);
+        }
+    }
+
+    /**
+     * Set cell value and publish
+     *
+     * @param value
+     */
+    public setValue(value: any): void {
+        this.value = value;
+        this.publish();
+    }
 }

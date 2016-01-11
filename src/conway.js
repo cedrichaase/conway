@@ -1,4 +1,370 @@
-///<reference path="Vector2D.ts"/>
+var Vector = (function () {
+    function Vector() {
+    }
+    return Vector;
+})();
+//# sourceMappingURL=Vector.js.map
+;
+///<reference path="../Vector/Vector.ts"/>
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+/**
+ * Generic 2D Number Vector Class
+ */
+var Vector2D = (function (_super) {
+    __extends(Vector2D, _super);
+    /**
+     * The constructor
+     *
+     * @param x
+     * @param y
+     */
+    function Vector2D(x, y) {
+        _super.call(this);
+        this.x = x;
+        this.y = y;
+    }
+    return Vector2D;
+})(Vector);
+//# sourceMappingURL=Vector2D.js.map
+;
+///<reference path="../Vector/Vector.ts"/>
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+/**
+ * Generic 3D Number Vector Class
+ */
+var Vector3D = (function (_super) {
+    __extends(Vector3D, _super);
+    /**
+     * The constructor
+     *
+     * @param x
+     * @param y
+     * @param z
+     */
+    function Vector3D(x, y, z) {
+        _super.call(this);
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+    return Vector3D;
+})(Vector);
+//# sourceMappingURL=Vector3D.js.map
+;
+///<reference path="Observer.ts"/>
+//# sourceMappingURL=Observable.js.map
+;
+///<reference path="Observable.ts"/>
+//# sourceMappingURL=Observer.js.map
+;
+///<reference path="ClickBehavior.ts"/>
+///<reference path="../Cell2DBool.ts"/>
+//# sourceMappingURL=BooleanClickBehavior.js.map
+;
+//# sourceMappingURL=ClickBehavior.js.map
+;
+///<reference path="NumberClickBehavior.ts"/>
+///<reference path="../Cell2DNumber.ts"/>
+var DecrementClickBehavior = (function () {
+    function DecrementClickBehavior() {
+    }
+    DecrementClickBehavior.prototype.click = function (cell) {
+        cell.decrementValue();
+    };
+    return DecrementClickBehavior;
+})();
+//# sourceMappingURL=DecrementClickBehavior.js.map
+;
+///<reference path="NumberClickBehavior.ts"/>
+///<reference path="../Cell2DNumber.ts"/>
+var IncrementClickBehavior = (function () {
+    function IncrementClickBehavior() {
+    }
+    IncrementClickBehavior.prototype.click = function (cell) {
+        cell.incrementValue();
+    };
+    return IncrementClickBehavior;
+})();
+//# sourceMappingURL=IncrementClickBehavior.js.map
+;
+///<reference path="ClickBehavior.ts"/>
+///<reference path="../Cell2DNumber.ts"/>
+//# sourceMappingURL=NumberClickBehavior.js.map
+;
+///<reference path="BooleanClickBehavior.ts"/>
+///<reference path="../Cell2DBool.ts"/>
+var ToggleClickBehavior = (function () {
+    function ToggleClickBehavior() {
+    }
+    ToggleClickBehavior.prototype.click = function (cell) {
+        cell.toggleValue();
+    };
+    return ToggleClickBehavior;
+})();
+//# sourceMappingURL=ToggleClickBehavior.js.map
+;
+/// <reference path="../../../vendor/jquery.d.ts" />
+///<reference path="../Vector/Vector.ts"/>
+///<reference path="../Observer/Observable.ts"/>
+///<reference path="../Observer/Observer.ts"/>
+///<reference path="Behavior/ClickBehavior.ts"/>
+/**
+ * Class Cell
+ */
+var Cell = (function () {
+    /**
+     * The constructor
+     *
+     * @param coords
+     * @param value
+     */
+    function Cell(coords, value) {
+        this.coords = coords;
+        this.value = value;
+        this.observers = [];
+    }
+    /**
+     * Use the ClickBehavior's click method
+     */
+    Cell.prototype.click = function () {
+        this.clickBehavior.click(this);
+    };
+    /**
+     * Register an observer
+     *
+     * @param observer
+     */
+    Cell.prototype.registerObserver = function (observer) {
+        this.observers.push(observer);
+    };
+    /**
+     * Un-register an observer
+     *
+     * @param observer
+     */
+    Cell.prototype.removeObserver = function (observer) {
+        // TODO: implement
+        return;
+    };
+    /**
+     * Publish state to observers
+     */
+    Cell.prototype.publish = function () {
+        for (var _i = 0, _a = this.observers; _i < _a.length; _i++) {
+            var observer = _a[_i];
+            observer.update(this);
+        }
+    };
+    /**
+     * Set cell value and publish
+     *
+     * @param value
+     */
+    Cell.prototype.setValue = function (value) {
+        this.value = value;
+        this.publish();
+    };
+    return Cell;
+})();
+//# sourceMappingURL=Cell.js.map
+;
+/// <reference path="../../../vendor/jquery.d.ts" />
+///<reference path="Cell.ts"/>
+///<reference path="../Vector/Vector2D.ts"/>
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+/**
+ * Class Cell
+ */
+var Cell2D = (function (_super) {
+    __extends(Cell2D, _super);
+    /**
+     * The constructor
+     *
+     * @param coords
+     * @param value
+     */
+    function Cell2D(coords, value) {
+        _super.call(this, coords, value);
+    }
+    /**
+     * Return coordinates to this cell's top left
+     *
+     * @returns {Vector2D}
+     */
+    Cell2D.prototype.getCoordsTopLeft = function () {
+        return new Vector2D(this.coords.x - 1, this.coords.y - 1);
+    };
+    /**
+     * Return coordinates to this cell's top
+     *
+     * @returns {Vector2D}
+     */
+    Cell2D.prototype.getCoordsTop = function () {
+        return new Vector2D(this.coords.x, this.coords.y - 1);
+    };
+    /**
+     * Return coordinates to this cell's top right
+     *
+     * @returns {Vector2D}
+     */
+    Cell2D.prototype.getCoordsTopRight = function () {
+        return new Vector2D(this.coords.x + 1, this.coords.y - 1);
+    };
+    /**
+     * Return coordinates to this cell's right
+     *
+     * @returns {Vector2D}
+     */
+    Cell2D.prototype.getCoordsRight = function () {
+        return new Vector2D(this.coords.x + 1, this.coords.y);
+    };
+    /**
+     * Return coordinates to this cell's bottom right
+     *
+     * @returns {Vector2D}
+     */
+    Cell2D.prototype.getCoordsBottomRight = function () {
+        return new Vector2D(this.coords.x + 1, this.coords.y + 1);
+    };
+    /**
+     * Return coordinates to this cell's bottom
+     *
+     * @returns {Vector2D}
+     */
+    Cell2D.prototype.getCoordsBottom = function () {
+        return new Vector2D(this.coords.x, this.coords.y + 1);
+    };
+    /**
+     * Return coordinates to this cell's bottom left
+     *
+     * @returns {Vector2D}
+     */
+    Cell2D.prototype.getCoordsBottomLeft = function () {
+        return new Vector2D(this.coords.x - 1, this.coords.y + 1);
+    };
+    /**
+     * Return coordinates to this cell's left
+     *
+     * @returns {Vector2D}
+     */
+    Cell2D.prototype.getCoordsLeft = function () {
+        return new Vector2D(this.coords.x - 1, this.coords.y);
+    };
+    return Cell2D;
+})(Cell);
+//# sourceMappingURL=Cell2D.js.map
+;
+///<reference path="Cell2D.ts"/>
+///<reference path="Behavior/BooleanClickBehavior.ts"/>
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+/**
+ * A 2D Cell that stores a boolean value
+ */
+var Cell2DBool = (function (_super) {
+    __extends(Cell2DBool, _super);
+    /**
+     * Boolean 2D Cell constructor
+     *
+     * @param coords
+     * @param value
+     * @param clickBehavior
+     */
+    function Cell2DBool(coords, value, clickBehavior) {
+        _super.call(this, coords, value);
+        this.clickBehavior = clickBehavior;
+    }
+    /**
+     * Toggle cell value
+     */
+    Cell2DBool.prototype.toggleValue = function () {
+        this.setValue(!this.value);
+    };
+    return Cell2DBool;
+})(Cell2D);
+//# sourceMappingURL=Cell2DBool.js.map
+;
+///<reference path="Cell2D.ts"/>
+///<reference path="Behavior/NumberClickBehavior.ts"/>
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+/**
+ * A 2D Cell that stores a boolean value
+ */
+var Cell2DNumber = (function (_super) {
+    __extends(Cell2DNumber, _super);
+    /**
+     * Boolean 2D Cell constructor
+     *
+     * @param coords
+     * @param value
+     * @param clickBehavior
+     */
+    function Cell2DNumber(coords, value, clickBehavior) {
+        _super.call(this, coords, value);
+        this.clickBehavior = clickBehavior;
+    }
+    /**
+     * Increment cell value
+     */
+    Cell2DNumber.prototype.incrementValue = function () {
+        this.setValue(this.value + 1);
+    };
+    /**
+     * Decrement cell value
+     */
+    Cell2DNumber.prototype.decrementValue = function () {
+        this.setValue(this.value - 1);
+    };
+    return Cell2DNumber;
+})(Cell2D);
+//# sourceMappingURL=Cell2DNumber.js.map
+;
+/// <reference path="../../../vendor/jquery.d.ts" />
+///<reference path="Cell.ts"/>
+///<reference path="../Vector/Vector3D.ts"/>
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+/**
+ * Class Cell
+ */
+var Cell3D = (function (_super) {
+    __extends(Cell3D, _super);
+    /**
+     * The constructor
+     *
+     * @param coords
+     * @param value
+     */
+    function Cell3D(coords, value) {
+        _super.call(this, coords, value);
+    }
+    return Cell3D;
+})(Cell);
+//# sourceMappingURL=Cell3D.js.map
+;
+///<reference path="../Vector/Vector2D.ts"/>
 /// <reference path="../../../vendor/jquery.d.ts" />
 var Canvas = (function () {
     /**
@@ -10,10 +376,12 @@ var Canvas = (function () {
         /**
          * The rendering interval in milliseconds
          */
-        this.renderInterval = 100;
+        this.renderInterval = 50;
         this.element = element;
         this.$element = $(element);
         this.ctx = element.getContext('2d');
+        this.width = element.width;
+        this.height = element.height;
     }
     /**
      * Returns the mouse pointer position in relation to the canvas
@@ -31,7 +399,7 @@ var Canvas = (function () {
      * Clears the canvas
      */
     Canvas.prototype.clear = function () {
-        this.ctx.clearRect(0, 0, this.element.width, this.element.height);
+        this.ctx.clearRect(0, 0, this.width, this.height);
     };
     /**
      * starts/stops Canvas rendering
@@ -73,117 +441,9 @@ var Canvas = (function () {
 })();
 //# sourceMappingURL=Canvas.js.map
 ;
-/**
- * Generic 2D Number Vector Class
- */
-var Vector2D = (function () {
-    /**
-     * The constructor
-     *
-     * @param x
-     * @param y
-     */
-    function Vector2D(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-    return Vector2D;
-})();
-//# sourceMappingURL=Vector2D.js.map
-;
 /// <reference path="../../../vendor/jquery.d.ts" />
-///<reference path="Grid.ts"/>
-/**
- * Class Cell
- */
-var Cell = (function () {
-    /**
-     * The constructor
-     *
-     * @param coords
-     * @param value
-     */
-    function Cell(coords, value) {
-        this.coords = coords;
-        this.value = value;
-    }
-    /**
-     * Toggles the cell value
-     */
-    Cell.prototype.toggleValue = function () {
-        this.value = !this.value;
-    };
-    /**
-     * Return coordinates to this cell's top left
-     *
-     * @returns {Vector2D}
-     */
-    Cell.prototype.getCoordsTopLeft = function () {
-        return new Vector2D(this.coords.x - 1, this.coords.y - 1);
-    };
-    /**
-     * Return coordinates to this cell's top
-     *
-     * @returns {Vector2D}
-     */
-    Cell.prototype.getCoordsTop = function () {
-        return new Vector2D(this.coords.x, this.coords.y - 1);
-    };
-    /**
-     * Return coordinates to this cell's top right
-     *
-     * @returns {Vector2D}
-     */
-    Cell.prototype.getCoordsTopRight = function () {
-        return new Vector2D(this.coords.x + 1, this.coords.y - 1);
-    };
-    /**
-     * Return coordinates to this cell's right
-     *
-     * @returns {Vector2D}
-     */
-    Cell.prototype.getCoordsRight = function () {
-        return new Vector2D(this.coords.x + 1, this.coords.y);
-    };
-    /**
-     * Return coordinates to this cell's bottom right
-     *
-     * @returns {Vector2D}
-     */
-    Cell.prototype.getCoordsBottomRight = function () {
-        return new Vector2D(this.coords.x + 1, this.coords.y + 1);
-    };
-    /**
-     * Return coordinates to this cell's bottom
-     *
-     * @returns {Vector2D}
-     */
-    Cell.prototype.getCoordsBottom = function () {
-        return new Vector2D(this.coords.x, this.coords.y + 1);
-    };
-    /**
-     * Return coordinates to this cell's bottom left
-     *
-     * @returns {Vector2D}
-     */
-    Cell.prototype.getCoordsBottomLeft = function () {
-        return new Vector2D(this.coords.x - 1, this.coords.y + 1);
-    };
-    /**
-     * Return coordinates to this cell's left
-     *
-     * @returns {Vector2D}
-     */
-    Cell.prototype.getCoordsLeft = function () {
-        return new Vector2D(this.coords.x - 1, this.coords.y);
-    };
-    return Cell;
-})();
-//# sourceMappingURL=Cell.js.map
-;
-/// <reference path="../../../vendor/jquery.d.ts" />
-/// <reference path="Cell.ts" />
-///<reference path="../Canvas/Vector2D.ts"/>
+/// <reference path="../Cell/Cell2D.ts" />
+///<reference path="../Vector/Vector2D.ts"/>
 ///<reference path="NeighborCoordinates.ts"/>
 ///<reference path="NeighborCells.ts"/>
 /**
@@ -209,7 +469,7 @@ var Grid = (function () {
             this.matrix[column] = [];
             for (var line = 0; line < height; line++) {
                 var coords = new Vector2D(column, line);
-                this.matrix[column][line] = new Cell(coords, false);
+                this.matrix[column][line] = new Cell2D(coords, false);
             }
         }
     }
@@ -217,12 +477,12 @@ var Grid = (function () {
      * Returns a Cell by coordinates
      *
      * @param coords
-     * @returns {Cell}
+     * @returns {Cell2D}
      */
     Grid.prototype.getCell = function (coords) {
         var x = coords.x;
         var y = coords.y;
-        var cell = new Cell(coords, false);
+        var cell = new Cell2D(coords, false);
         if (!(x < 0 || y < 0 || x >= this.width || y >= this.height))
             cell = this.matrix[x][y];
         return cell;
@@ -268,33 +528,47 @@ var GridCanvas = (function (_super) {
      */
     function GridCanvas(element, hCells, vCells) {
         _super.call(this, element);
+        /**
+         * The grid color
+         */
+        this.gridColor = '#000';
+        /**
+         * padding
+         *
+         * @type {number}
+         */
+        this.padding = 15.5;
         this.grid = new Grid(hCells, vCells);
-        this.showGrid = true;
+        for (var _i = 0, _a = this.grid.matrix; _i < _a.length; _i++) {
+            var col = _a[_i];
+            for (var _b = 0; _b < col.length; _b++) {
+                var cell = col[_b];
+                cell.registerObserver(this);
+            }
+        }
+        this.gridNeedsRedraw = true;
         this.addEventListeners();
         this.start();
     }
-    /**
-     * Toggle showing the grid
-     */
-    GridCanvas.prototype.toggleShowGrid = function () {
-        this.showGrid = !this.showGrid;
-    };
     GridCanvas.prototype.drawGrid = function () {
-        var width = this.element.width;
-        var height = this.element.height;
+        var width = this.width;
+        var height = this.height;
         var hSpacing = width / this.grid.width;
         var vSpacing = height / this.grid.height;
-        for (var hLine = 0; hLine <= this.grid.width; hLine++) {
+        this.ctx.save();
+        this.ctx.translate(0.5, 0.5);
+        for (var hLine = 1; hLine <= this.grid.width; hLine++) {
             var x = hLine * hSpacing;
             this.drawVerticalLine(x, this.lineWidth, this.gridColor);
         }
-        for (var vLine = 0; vLine <= this.grid.height; vLine++) {
+        for (var vLine = 1; vLine <= this.grid.height; vLine++) {
             var y = vLine * vSpacing;
             this.drawHorizontalLine(y, this.lineWidth, this.gridColor);
         }
+        this.ctx.restore();
     };
     GridCanvas.prototype.drawVerticalLine = function (x, lineWidth, color) {
-        var height = this.element.height;
+        var height = this.height;
         this.ctx.save();
         this.ctx.strokeStyle = color;
         this.ctx.fillStyle = color;
@@ -306,7 +580,7 @@ var GridCanvas = (function (_super) {
         this.ctx.restore();
     };
     GridCanvas.prototype.drawHorizontalLine = function (y, lineWidth, color) {
-        var width = this.element.width;
+        var width = this.width;
         this.ctx.save();
         this.ctx.strokeStyle = color;
         this.ctx.fillStyle = color;
@@ -317,14 +591,52 @@ var GridCanvas = (function (_super) {
         this.ctx.stroke();
         this.ctx.restore();
     };
-    GridCanvas.prototype.fillCellAtCoords = function (coords) {
-        var cellWidth = this.element.width / this.grid.width;
-        var cellHeight = this.element.height / this.grid.height;
+    /**
+     * Fill a Cell at given coords with given color
+     *
+     * @param coords
+     * @param color
+     */
+    GridCanvas.prototype.fillCellAtCoords = function (coords, color) {
+        var cellWidth = this.width / this.grid.width;
+        var cellHeight = this.height / this.grid.height;
         var xPos = coords.x * cellWidth;
         var yPos = coords.y * cellHeight;
         this.ctx.save();
+        this.ctx.fillStyle = color;
         this.ctx.fillRect(xPos, yPos, cellWidth, cellHeight);
         this.ctx.restore();
+    };
+    GridCanvas.prototype.clearCellAtCoords = function (coords) {
+        var bgcolor = '#FFF';
+        var cellWidth = this.width / this.grid.width;
+        var cellHeight = this.height / this.grid.height;
+        var xPos = coords.x * cellWidth;
+        var yPos = coords.y * cellHeight;
+        this.ctx.save();
+        this.ctx.fillStyle = this.gridColor;
+        this.ctx.fillRect(xPos, yPos, cellWidth, cellHeight);
+        this.ctx.restore();
+        this.ctx.save();
+        this.ctx.fillStyle = bgcolor;
+        this.ctx.fillRect(xPos + 1, yPos + 1, cellWidth - 1, cellHeight - 1);
+        this.ctx.restore();
+    };
+    /**
+     * Fill a cell at given coords
+     *
+     * @param coords
+     */
+    GridCanvas.prototype.fillCell = function (coords) {
+        this.fillCellAtCoords(coords, '#000');
+    };
+    /**
+     * Clear a cell at given coords
+     *
+     * @param coords
+     */
+    GridCanvas.prototype.clearCell = function (coords) {
+        this.fillCellAtCoords(coords, '#FFF');
     };
     GridCanvas.prototype.drawGridMatrix = function () {
         var matrix = this.grid.matrix;
@@ -332,7 +644,7 @@ var GridCanvas = (function (_super) {
             for (var y = 0; y < matrix[x].length; y++) {
                 if (matrix[x][y].value) {
                     var coords = new Vector2D(x, y);
-                    this.fillCellAtCoords(coords);
+                    this.fillCell(coords);
                 }
             }
         }
@@ -346,8 +658,8 @@ var GridCanvas = (function (_super) {
     GridCanvas.prototype.canvasToGridCoords = function (canvasCoords) {
         var x = canvasCoords.x;
         var y = canvasCoords.y;
-        var cellX = Math.floor(x / this.element.width * this.grid.width);
-        var cellY = Math.floor(y / this.element.height * this.grid.height);
+        var cellX = Math.floor(x / this.width * this.grid.width);
+        var cellY = Math.floor(y / this.height * this.grid.height);
         return new Vector2D(cellX, cellY);
     };
     /**
@@ -359,21 +671,31 @@ var GridCanvas = (function (_super) {
             var canvasCoords = _this.getMouse(e);
             var gridCoords = _this.canvasToGridCoords(canvasCoords);
             var cell = _this.grid.getCell(gridCoords);
-            cell.toggleValue();
+            cell.click();
+            _this.update(cell);
         });
     };
     GridCanvas.prototype.render = function () {
-        _super.prototype.clear.call(this);
-        if (this.showGrid) {
+        if (this.gridNeedsRedraw) {
+            _super.prototype.clear.call(this);
             this.drawGrid();
+            this.gridNeedsRedraw = false;
         }
-        this.drawGridMatrix();
+        //this.drawGridMatrix();
+    };
+    GridCanvas.prototype.update = function (cell) {
+        if (cell.value) {
+            this.fillCell(cell.coords);
+        }
+        else {
+            this.clearCellAtCoords(cell.coords);
+        }
     };
     return GridCanvas;
 })(Canvas);
 //# sourceMappingURL=GridCanvas.js.map
 ;
-///<reference path="Cell.ts"/>
+///<reference path="../Cell/Cell2D.ts"/>
 var NeighborCells = (function () {
     /**
      * The constructor
@@ -385,7 +707,8 @@ var NeighborCells = (function () {
 })();
 //# sourceMappingURL=NeighborCells.js.map
 ;
-///<reference path="Cell.ts"/>
+///<reference path="../Vector/Vector2D.ts"/>
+///<reference path="../Cell/Cell2D.ts"/>
 var NeighborCoordinates = (function () {
     function NeighborCoordinates(cell) {
         this.topLeft = cell.getCoordsTopLeft();
@@ -419,7 +742,7 @@ var ConwayCanvas = (function (_super) {
      */
     function ConwayCanvas(element, hCells, vCells) {
         _super.call(this, element, hCells, vCells);
-        this.grid = new ConwayGrid(hCells, vCells);
+        this.grid = new ConwayGrid(hCells, vCells, this);
         this.executing = false;
     }
     /**
@@ -437,11 +760,45 @@ var ConwayCanvas = (function (_super) {
             this.grid = this.grid.executeConway();
         }
     };
+    ConwayCanvas.prototype.setRenderInterval = function (interval) {
+        this.stop();
+        this.renderInterval = interval;
+        this.start();
+    };
     return ConwayCanvas;
 })(GridCanvas);
 //# sourceMappingURL=ConwayCanvas.js.map
 ;
+///<reference path="../Cell/Cell2DBool.ts"/>
+///<reference path="../Cell/Behavior/ToggleClickBehavior.ts"/>
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+/**
+ * Class ConwayCell
+ */
+var ConwayCell = (function (_super) {
+    __extends(ConwayCell, _super);
+    function ConwayCell(coords, value) {
+        _super.call(this, coords, value, new ToggleClickBehavior());
+    }
+    /**
+     * Whether or not the Cell is alive
+     *
+     * @returns {boolean}
+     */
+    ConwayCell.prototype.isAlive = function () {
+        return this.value === true;
+    };
+    return ConwayCell;
+})(Cell2DBool);
+//# sourceMappingURL=ConwayCell.js.map
+;
 ///<reference path="../Grid/Grid.ts"/>
+///<reference path="ConwayCell.ts"/>
+///<reference path="ConwayCanvas.ts"/>
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -454,9 +811,18 @@ var ConwayGrid = (function (_super) {
      *
      * @param width
      * @param height
+     * @param canvas
      */
-    function ConwayGrid(width, height) {
+    function ConwayGrid(width, height, canvas) {
         _super.call(this, width, height);
+        for (var column = 0; column < width; column++) {
+            this.matrix[column] = [];
+            for (var line = 0; line < height; line++) {
+                var coords = new Vector2D(column, line);
+                this.matrix[column][line] = new ConwayCell(coords, false);
+            }
+        }
+        this.canvas = canvas;
     }
     /**
      * Counts the live cells surrounding the given Cell
@@ -494,23 +860,23 @@ var ConwayGrid = (function (_super) {
     ConwayGrid.prototype.livesInNextGeneration = function (cell) {
         var neighborCount = this.countLiveNeighbors(cell);
         // Any live cell with fewer than two live neighbours dies, as if caused by under-population.
-        if (cell.value === true
+        if (cell.isAlive()
             && neighborCount < 2) {
             return false;
         }
         // Any live cell with two or three live neighbours lives on to the next generation.
-        if (cell.value === true
+        if (cell.isAlive()
             && neighborCount < 4
             && neighborCount > 1) {
             return true;
         }
         // Any live cell with more than three live neighbours dies, as if by over-population.
-        if (cell.value === true
+        if (cell.isAlive()
             && neighborCount > 3) {
             return false;
         }
         // Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
-        if (cell.value === false
+        if (!cell.isAlive()
             && neighborCount === 3) {
             return true;
         }
@@ -522,7 +888,7 @@ var ConwayGrid = (function (_super) {
      * @returns {ConwayGrid}
      */
     ConwayGrid.prototype.executeConway = function () {
-        var nextGen = new ConwayGrid(this.width, this.height);
+        var nextGen = new ConwayGrid(this.width, this.height, this.canvas);
         var width = this.width;
         var height = this.height;
         for (var x = 0; x < width; x++) {
@@ -530,10 +896,28 @@ var ConwayGrid = (function (_super) {
                 var coords = new Vector2D(x, y);
                 var oldCell = this.getCell(coords);
                 var newCell = nextGen.getCell(coords);
-                newCell.value = this.livesInNextGeneration(oldCell);
+                var lives = this.livesInNextGeneration(oldCell);
+                newCell.setValue(lives);
+                if (newCell.value !== oldCell.value) {
+                    this.canvas.update(newCell);
+                }
             }
         }
         return nextGen;
+    };
+    /**
+     * Returns a Cell by coordinates
+     *
+     * @param coords
+     * @returns {ConwayCell}
+     */
+    ConwayGrid.prototype.getCell = function (coords) {
+        var x = coords.x;
+        var y = coords.y;
+        var cell = new ConwayCell(coords, false);
+        if (!(x < 0 || y < 0 || x >= this.width || y >= this.height))
+            cell = this.matrix[x][y];
+        return cell;
     };
     return ConwayGrid;
 })(Grid);

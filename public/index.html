@@ -9,7 +9,8 @@
       <canvas id="canvas1" width="1024" height="768"></canvas>
       <br/>
       <button id="toggleExec">Toggle execution</button>
-      <button id="toggleGrid">Toggle grid</button>
+      <label id="refreshRateLabel" for="refreshRate">Refresh rate</label>
+      <input id="refreshRate" name="refreshRate" type="range"/>
       <!--<button onclick="$('#canvas1').conway('toggleGrid')">Toggle grid</button>-->
       <!--<input name="color" id="color" type="color" value="#000000">-->
     </div>
@@ -20,17 +21,26 @@
 
       $(function() {
         var canvasElement = document.getElementById('canvas1');
-        var conwayCanvas = new ConwayCanvas(canvasElement, 32, 24);
+        var conwayCanvas = new ConwayCanvas(canvasElement, 256, 192);
 
         var toggleExec = document.getElementById('toggleExec');
         toggleExec.onclick = function(e) {
           conwayCanvas.toggleExecution();
         };
 
-        var toggleGrid = document.getElementById('toggleGrid');
-        toggleGrid.onclick = function(e) {
-          conwayCanvas.toggleShowGrid();
-        };
+//        var toggleGrid = document.getElementById('toggleGrid');
+//        toggleGrid.onclick = function(e) {
+//          conwayCanvas.toggleShowGrid();
+//        };
+
+        var refreshRate = $('#refreshRate');
+        var refreshRateLabel = $('#refreshRateLabel');
+        refreshRate.change(function(e) {
+          var rate = refreshRate.val() * 10;
+
+          conwayCanvas.setRenderInterval(rate);
+          refreshRateLabel.html('Refresh rate: ' + rate + 'ms');
+        });
 
 //        slider.on('change', function(e){
 //          var color = slider.val();

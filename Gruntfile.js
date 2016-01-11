@@ -24,6 +24,7 @@ module.exports = function(grunt) {
       dist: {
         src: [
           'src/Conway/Vector/*.js',
+          'src/Conway/Observer/*.js',
           'src/Conway/Cell/Behavior/*.js',
           'src/Conway/Cell/*.js',
           'src/Conway/Canvas/*.js',

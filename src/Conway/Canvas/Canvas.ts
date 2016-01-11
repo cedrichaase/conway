@@ -21,7 +21,7 @@ abstract class Canvas {
     /**
      * The rendering interval in milliseconds
      */
-    private renderInterval: number = 100;
+    public renderInterval: number = 50;
 
     /**
      * The rendering interval
@@ -33,6 +33,11 @@ abstract class Canvas {
      */
     private active: boolean;
 
+    public width: number;
+
+    public height: number;
+
+
     /**
      * The constructor
      *
@@ -43,6 +48,8 @@ abstract class Canvas {
         this.$element = $(element);
         this.ctx = element.getContext('2d');
 
+        this.width = element.width;
+        this.height = element.height;
     }
 
     /**
@@ -64,7 +71,7 @@ abstract class Canvas {
      * Clears the canvas
      */
     protected clear() {
-        this.ctx.clearRect(0, 0, this.element.width, this.element.height);
+        this.ctx.clearRect(0, 0, this.width, this.height);
     }
 
     /**

@@ -34,6 +34,6 @@ class Cell2DBool extends Cell2D {
      * Toggle cell value
      */
     public toggleValue() {
-        this.value = !this.value;
+        this.setValue(!this.value);
     }
 }

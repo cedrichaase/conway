@@ -33,14 +33,14 @@ class Cell2DNumber extends Cell2D {
      * Increment cell value
      */
     public incrementValue() {
-        this.value++;
+        this.setValue(this.value + 1);
     }
 
     /**
      * Decrement cell value
      */
     public decrementValue() {
-        this.value--;
+        this.setValue(this.value - 1);
     }
 }
 

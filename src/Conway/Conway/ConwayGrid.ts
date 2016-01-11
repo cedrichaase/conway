@@ -1,5 +1,6 @@
 ///<reference path="../Grid/Grid.ts"/>
 ///<reference path="ConwayCell.ts"/>
+///<reference path="ConwayCanvas.ts"/>
 
 class ConwayGrid extends Grid {
 
@@ -8,13 +9,16 @@ class ConwayGrid extends Grid {
      */
     public matrix: Array<Array<ConwayCell>>;
 
+    public canvas: ConwayCanvas;
+
     /**
      * Constructor
      *
      * @param width
      * @param height
+     * @param canvas
      */
-    public constructor(width: number, height: number) {
+    public constructor(width: number, height: number, canvas: ConwayCanvas) {
         super(width, height);
 
         for(var column = 0; column < width; column++) {
@@ -24,6 +28,8 @@ class ConwayGrid extends Grid {
                 this.matrix[column][line] = new ConwayCell(coords, false);
             }
         }
+
+        this.canvas = canvas;
     }
 
     /**
@@ -100,7 +106,7 @@ class ConwayGrid extends Grid {
      * @returns {ConwayGrid}
      */
     public executeConway() {
-        var nextGen = new ConwayGrid(this.width, this.height);
+        var nextGen = new ConwayGrid(this.width, this.height, this.canvas);
 
         var width = this.width;
         var height = this.height;
@@ -111,7 +117,12 @@ class ConwayGrid extends Grid {
                 var oldCell = this.getCell(coords);
                 var newCell = nextGen.getCell(coords);
 
-                newCell.value = this.livesInNextGeneration(oldCell);
+                var lives = this.livesInNextGeneration(oldCell);
+                newCell.setValue(lives);
+
+                if(newCell.value !== oldCell.value) {
+                    this.canvas.update(newCell);
+                }
             }
         }
 
