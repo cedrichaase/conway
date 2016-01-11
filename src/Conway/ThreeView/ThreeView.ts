@@ -102,7 +102,7 @@ class ThreeView {
         this.animate();
     }
 
-    public render = () => {
+    public render() {
         var timer = Date.now() * 0.0001;
 
         this.camera.position.x = Math.cos(timer) * 200;
