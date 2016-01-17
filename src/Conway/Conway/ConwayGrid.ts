@@ -1,6 +1,6 @@
 ///<reference path="../Grid/Grid.ts"/>
 ///<reference path="ConwayCell.ts"/>
-///<reference path="ConwayCanvas.ts"/>
+///<reference path="../ThreeView/ThreeView.ts"/>
 
 class ConwayGrid extends Grid {
 
@@ -9,16 +9,16 @@ class ConwayGrid extends Grid {
      */
     public matrix: Array<Array<ConwayCell>>;
 
-    public canvas: ConwayCanvas;
+    public view: ThreeView;
 
     /**
      * Constructor
      *
      * @param width
      * @param height
-     * @param canvas
+     * @param view
      */
-    public constructor(width: number, height: number, canvas: ConwayCanvas) {
+    public constructor(width: number, height: number, view: ThreeView) {
         super(width, height);
 
         for(var column = 0; column < width; column++) {
@@ -29,7 +29,7 @@ class ConwayGrid extends Grid {
             }
         }
 
-        this.canvas = canvas;
+        this.view = view;
     }
 
     /**
@@ -106,7 +106,7 @@ class ConwayGrid extends Grid {
      * @returns {ConwayGrid}
      */
     public executeConway() {
-        var nextGen = new ConwayGrid(this.width, this.height, this.canvas);
+        var nextGen = new ConwayGrid(this.width, this.height, this.view);
 
         var width = this.width;
         var height = this.height;
@@ -121,7 +121,7 @@ class ConwayGrid extends Grid {
                 newCell.setValue(lives);
 
                 if(newCell.value !== oldCell.value) {
-                    this.canvas.update(newCell);
+                    this.view.update(newCell);
                 }
             }
         }
