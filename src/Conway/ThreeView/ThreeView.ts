@@ -15,12 +15,19 @@ class ThreeView {
 
     public lookAtScene: boolean;
 
+    public size: number = 500;
+
+    public gridWidth: number = 50;
+
+    public rotating: boolean = true;
+
     public constructor(element) {
         this.lookAtScene = true;
 
         this.container = element;
 
         this.camera = new CombinedCamera(window.innerWidth / 2, window.innerHeight / 2, 70, 1, 1000, - 500, 1000);
+        this.setOrthographic();
 
         this.camera.position.x = 200;
         this.camera.position.y = 100;
@@ -28,62 +35,11 @@ class ThreeView {
 
         this.scene = new THREE.Scene();
 
-        // Grid
-        var size = 500, step = 50;
-        var geometry = new THREE.Geometry();
 
-        for (var i = - size; i <= size; i += step) {
+        this.addGridToScene();
+        this.addCubesToScene();
+        this.addLightsToScene();
 
-            geometry.vertices.push(new THREE.Vector3(- size, 0, i));
-            geometry.vertices.push(new THREE.Vector3(  size, 0, i));
-
-            geometry.vertices.push(new THREE.Vector3(i, 0, - size));
-            geometry.vertices.push(new THREE.Vector3(i, 0,   size));
-
-        }
-
-        var lineBasicMaterial = new THREE.LineBasicMaterial({ color: 0x000000, opacity: 0.2 });
-
-        var line = new THREE.LineSegments(geometry, lineBasicMaterial);
-        this.scene.add(line);
-
-        // Cubes
-
-        var boxGeometry = new THREE.BoxGeometry(50, 50, 50);
-        var material = new THREE.MeshLambertMaterial({ color: 0xffffff, overdraw: 0.5 });
-
-        for (var i = 0; i < 100; i ++) {
-
-            var cube = new THREE.Mesh(boxGeometry, material);
-
-            cube.scale.y = Math.floor(Math.random() * 2 + 1);
-
-            cube.position.x = Math.floor((Math.random() * 1000 - 500) / 50) * 50 + 25;
-            cube.position.y = (cube.scale.y * 50) / 2;
-            cube.position.z = Math.floor((Math.random() * 1000 - 500) / 50) * 50 + 25;
-
-            this.scene.add(cube);
-
-        }
-
-        // Lights
-
-        var ambientLight = new THREE.AmbientLight(Math.random() * 0x10);
-        this.scene.add(ambientLight);
-
-        var directionalLight = new THREE.DirectionalLight(Math.random() * 0xffffff);
-        directionalLight.position.x = Math.random() - 0.5;
-        directionalLight.position.y = Math.random() - 0.5;
-        directionalLight.position.z = Math.random() - 0.5;
-        directionalLight.position.normalize();
-        this.scene.add(directionalLight);
-
-        var directionalLight = new THREE.DirectionalLight(Math.random() * 0xffffff);
-        directionalLight.position.x = Math.random() - 0.5;
-        directionalLight.position.y = Math.random() - 0.5;
-        directionalLight.position.z = Math.random() - 0.5;
-        directionalLight.position.normalize();
-        this.scene.add(directionalLight);
 
         this.renderer = new THREE.CanvasRenderer();
         this.renderer.setClearColor(0xf0f0f0);
@@ -101,18 +57,92 @@ class ThreeView {
         this.animate();
     }
 
-    public render() {
-        var timer = Date.now() * 0.0001;
+    /**
+     * Add a grid to the scene
+     */
+    private addGridToScene(): void {
+        // Grid
+        var size = this.size;
+        var step = 50;
 
-        this.camera.position.x = Math.cos(timer) * 200;
-        this.camera.position.z = Math.sin(timer) * 200;
+        var geometry = new THREE.Geometry();
+
+        for (var i = - size; i <= size; i += step) {
+
+            geometry.vertices.push(new THREE.Vector3(- size, 0, i));
+            geometry.vertices.push(new THREE.Vector3(  size, 0, i));
+
+            geometry.vertices.push(new THREE.Vector3(i, 0, - size));
+            geometry.vertices.push(new THREE.Vector3(i, 0,   size));
+
+        }
+
+        var lineBasicMaterial = new THREE.LineBasicMaterial({ color: 0x000000, opacity: 0.2 });
+
+        var line = new THREE.LineSegments(geometry, lineBasicMaterial);
+        this.scene.add(line);
+    }
+
+    /**
+     * Add cubes to the scene
+     */
+    private addCubesToScene(): void {
+        // Cubes
+        var boxGeometry = new THREE.BoxGeometry(50, 50, 50);
+        var material = new THREE.MeshLambertMaterial({ color: 0xffffff, overdraw: 0.5 });
+
+        for (var i = 0; i < 50; i ++) {
+            var cube = new THREE.Mesh(boxGeometry, material);
+
+            cube.scale.y = Math.floor(Math.random() * 2 + 1);
+
+            cube.position.x = Math.floor((Math.random() * 1000 - 500) / 50) * 50 + 25;
+            cube.position.y = (cube.scale.y * 50) / 2;
+            cube.position.z = Math.floor((Math.random() * 1000 - 500) / 50) * 50 + 25;
+
+            this.scene.add(cube);
+        }
+    }
+
+    /**
+     * Add lights to the scene
+     */
+    private addLightsToScene(): void {
+        // Lights
+        var ambientLight = new THREE.AmbientLight(Math.random() * 0x10);
+        this.scene.add(ambientLight);
+
+        var directionalLight = new THREE.DirectionalLight(Math.random() * 0xffffff);
+        directionalLight.position.x = Math.random() - 0.5;
+        directionalLight.position.y = Math.random() - 0.5;
+        directionalLight.position.z = Math.random() - 0.5;
+        directionalLight.position.normalize();
+        this.scene.add(directionalLight);
+
+        var directionalLight = new THREE.DirectionalLight(Math.random() * 0xffffff);
+        directionalLight.position.x = Math.random() - 0.5;
+        directionalLight.position.y = Math.random() - 0.5;
+        directionalLight.position.z = Math.random() - 0.5;
+        directionalLight.position.normalize();
+        this.scene.add(directionalLight);
+    }
+
+    public render() {
         if (this.lookAtScene) this.camera.lookAt(this.scene.position);
 
         this.renderer.render(this.scene, this.camera);
-    };
+    }
 
     public animate = () => {
+        if(this.rotating) {
+            var timer = Date.now() * 0.0001;
+
+            this.camera.position.x = Math.cos(timer) * 200;
+            this.camera.position.z = Math.sin(timer) * 200;
+        }
+
         requestAnimationFrame(this.animate);
+
         this.render();
     };
 
