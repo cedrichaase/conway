@@ -53,9 +53,9 @@ class ThreeView {
 
         //this.camera = new CombinedCamera(window.innerWidth / 2, window.innerHeight / 2, 70, 1, 1000, - 500, 1000);
 
-        this.camera.position.x = 200;
-        this.camera.position.y = 100;
-        this.camera.position.z = 200;
+        this.getCamera().position.x = 200;
+        this.getCamera().position.y = 100;
+        this.getCamera().position.z = 200;
 
         this.objects = [];
 
@@ -95,7 +95,7 @@ class ThreeView {
      * @returns {Camera}
      */
     private getCamera(): Camera {
-        if(!this.camera) {
+        if(typeof this.camera === "undefined") {
             this.camera = new THREE.OrthographicCamera(
                 window.innerWidth / - 2,
                 window.innerWidth / 2,
@@ -216,9 +216,10 @@ class ThreeView {
     }
 
     public render() {
-        if (this.lookAtScene) this.camera.lookAt(this.scene.position);
+        var camera = this.getCamera();
 
-        this.renderer.render(this.scene, this.camera);
+        if (this.lookAtScene) camera.lookAt(this.scene.position);
+        this.renderer.render(this.scene, camera);
     }
 
     public animate = () => {
@@ -235,13 +236,13 @@ class ThreeView {
     };
 
     setFov(fov) {
-        this.camera.setFov(fov);
+        this.getCamera().setFov(fov);
         console.log('FOV '+ fov.toFixed(2) +'&deg;');
     }
 
     setLens(lens) {
         // try adding a tween effect while changing focal length, and it'd be even cooler!
-        var fov = this.camera.setLens(lens);
+        var fov = this.getCamera().setLens(lens);
         console.log('Converted ' + lens + 'mm lens to FOV '+ fov.toFixed(2) +'&deg;');
     }
 
@@ -263,8 +264,8 @@ class ThreeView {
 
 
     onWindowResize() {
-        this.camera.setSize(window.innerWidth, window.innerHeight);
-        this.camera.updateProjectionMatrix();
+        this.getCamera().setSize(window.innerWidth, window.innerHeight);
+        this.getCamera().updateProjectionMatrix();
 
         this.renderer.setSize(window.innerWidth, window.innerHeight);
     }
@@ -282,7 +283,7 @@ class ThreeView {
     public onDocumentMouseMove = (event) => {
         event.preventDefault();
         this.mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
-        this.raycaster.setFromCamera(this.mouse, this.camera);
+        this.raycaster.setFromCamera(this.mouse, this.getCamera());
         var intersects = this.raycaster.intersectObjects( this.objects );
         if ( intersects.length > 0 ) {
             var intersect = intersects[ 0 ];
@@ -296,7 +297,7 @@ class ThreeView {
     public onDocumentMouseDown = (event) => {
         event.preventDefault();
         this.mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
-        this.raycaster.setFromCamera(this.mouse, this.camera);
+        this.raycaster.setFromCamera(this.mouse, this.getCamera());
         var intersects = this.raycaster.intersectObjects(this.objects);
 
         if(intersects.length > 0) {
