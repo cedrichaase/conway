@@ -742,7 +742,7 @@ var ConwayCanvas = (function (_super) {
      */
     function ConwayCanvas(element, hCells, vCells) {
         _super.call(this, element, hCells, vCells);
-        this.grid = new ConwayGrid(hCells, vCells, this);
+        //this.grid = new ConwayGrid(hCells, vCells, this);
         this.executing = false;
     }
     /**
@@ -798,7 +798,7 @@ var ConwayCell = (function (_super) {
 ;
 ///<reference path="../Grid/Grid.ts"/>
 ///<reference path="ConwayCell.ts"/>
-///<reference path="ConwayCanvas.ts"/>
+///<reference path="../ThreeView/ThreeView.ts"/>
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -811,9 +811,9 @@ var ConwayGrid = (function (_super) {
      *
      * @param width
      * @param height
-     * @param canvas
+     * @param view
      */
-    function ConwayGrid(width, height, canvas) {
+    function ConwayGrid(width, height, view) {
         _super.call(this, width, height);
         for (var column = 0; column < width; column++) {
             this.matrix[column] = [];
@@ -822,7 +822,7 @@ var ConwayGrid = (function (_super) {
                 this.matrix[column][line] = new ConwayCell(coords, false);
             }
         }
-        this.canvas = canvas;
+        this.view = view;
     }
     /**
      * Counts the live cells surrounding the given Cell
@@ -888,7 +888,7 @@ var ConwayGrid = (function (_super) {
      * @returns {ConwayGrid}
      */
     ConwayGrid.prototype.executeConway = function () {
-        var nextGen = new ConwayGrid(this.width, this.height, this.canvas);
+        var nextGen = new ConwayGrid(this.width, this.height, this.view);
         var width = this.width;
         var height = this.height;
         for (var x = 0; x < width; x++) {
@@ -899,7 +899,7 @@ var ConwayGrid = (function (_super) {
                 var lives = this.livesInNextGeneration(oldCell);
                 newCell.setValue(lives);
                 if (newCell.value !== oldCell.value) {
-                    this.canvas.update(newCell);
+                    this.view.update(newCell);
                 }
             }
         }
@@ -922,3 +922,423 @@ var ConwayGrid = (function (_super) {
     return ConwayGrid;
 })(Grid);
 //# sourceMappingURL=ConwayGrid.js.map
+;
+///<reference path="../../../vendor/three.d.ts"/>
+///<reference path="../Vector/Vector3D.ts"/>
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var OrthographicCamera = THREE.OrthographicCamera;
+var PerspectiveCamera = THREE.PerspectiveCamera;
+var Camera = THREE.Camera;
+var Euler = THREE.Euler;
+/**
+ *	@author zz85 / http://twitter.com/blurspline / http://www.lab4games.net/zz85/blog
+ *
+ *	A general perpose camera, for setting FOV, Lens Focal Length,
+ *		and switching between perspective and orthographic views easily.
+ *		Use this only if you do not wish to manage
+ *		both a Orthographic and Perspective Camera
+ *
+ */
+var CombinedCamera = (function (_super) {
+    __extends(CombinedCamera, _super);
+    function CombinedCamera(width, height, fov, near, far, orthoNear, orthoFar) {
+        _super.call(this);
+        //THREE.Camera.call(this);
+        this.fov = fov;
+        this.left = -width / 2;
+        this.right = width / 2;
+        this.top = height / 2;
+        this.bottom = -height / 2;
+        // We could also handle the projectionMatrix internally, but just wanted to test nested camera objects
+        this.cameraO = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, orthoNear, orthoFar);
+        this.cameraP = new THREE.PerspectiveCamera(fov, width / height, near, far);
+        this.zoom = 1;
+        this.toPerspective();
+    }
+    /**
+     * Switches to perspective camera
+     */
+    CombinedCamera.prototype.toPerspective = function () {
+        this.near = this.cameraP.near;
+        this.far = this.cameraP.far;
+        this.cameraP.fov = this.fov / this.zoom;
+        this.cameraP.updateProjectionMatrix();
+        this.projectionMatrix = this.cameraP.projectionMatrix;
+        this.inPerspectiveMode = true;
+        this.inOrthographicMode = false;
+    };
+    /**
+     * Switches to the Orthographic camera estimating viewport from Perspective
+     */
+    CombinedCamera.prototype.toOrthographic = function () {
+        var fov = this.fov;
+        var aspect = this.cameraP.aspect;
+        var near = this.cameraP.near;
+        var far = this.cameraP.far;
+        // The size that we set is the mid plane of the viewing frustum
+        var hyperfocus = (near + far) / 2;
+        var halfHeight = Math.tan(fov * Math.PI / 180 / 2) * hyperfocus;
+        var planeHeight = 2 * halfHeight;
+        var planeWidth = planeHeight * aspect;
+        var halfWidth = planeWidth / 2;
+        halfHeight /= this.zoom;
+        halfWidth /= this.zoom;
+        this.cameraO.left = -halfWidth;
+        this.cameraO.right = halfWidth;
+        this.cameraO.top = halfHeight;
+        this.cameraO.bottom = -halfHeight;
+        // this.cameraO.left = -farHalfWidth;
+        // this.cameraO.right = farHalfWidth;
+        // this.cameraO.top = farHalfHeight;
+        // this.cameraO.bottom = -farHalfHeight;
+        // this.cameraO.left = this.left / this.zoom;
+        // this.cameraO.right = this.right / this.zoom;
+        // this.cameraO.top = this.top / this.zoom;
+        // this.cameraO.bottom = this.bottom / this.zoom;
+        this.cameraO.updateProjectionMatrix();
+        this.near = this.cameraO.near;
+        this.far = this.cameraO.far;
+        this.projectionMatrix = this.cameraO.projectionMatrix;
+        this.inPerspectiveMode = false;
+        this.inOrthographicMode = true;
+    };
+    CombinedCamera.prototype.setSize = function (width, height) {
+        this.cameraP.aspect = width / height;
+        this.left = -width / 2;
+        this.right = width / 2;
+        this.top = height / 2;
+        this.bottom = -height / 2;
+    };
+    CombinedCamera.prototype.setFov = function (fov) {
+        this.fov = fov;
+        if (this.inPerspectiveMode) {
+            this.toPerspective();
+        }
+        else {
+            this.toOrthographic();
+        }
+    };
+    CombinedCamera.prototype.updateProjectionMatrix = function () {
+        if (this.inPerspectiveMode) {
+            this.toPerspective();
+        }
+        else {
+            this.toPerspective();
+            this.toOrthographic();
+        }
+    };
+    /**
+     * Uses Focal Length (in mm) to estimate and set FOV
+     * 35mm (fullframe) camera is used if frame size is not specified;
+     * Formula based on http://www.bobatkins.com/photography/technical/field_of_view.html
+     *
+     * @param focalLength
+     * @param frameHeight
+     * @returns {number}
+     */
+    CombinedCamera.prototype.setLens = function (focalLength, frameHeight) {
+        //if (frameHeight === undefined) frameHeight = 24;
+        if (frameHeight === void 0) { frameHeight = 24; }
+        var fov = 2 * THREE.Math.radToDeg(Math.atan(frameHeight / (focalLength * 2)));
+        this.setFov(fov);
+        return fov;
+    };
+    CombinedCamera.prototype.setZoom = function (zoom) {
+        this.zoom = zoom;
+        if (this.inPerspectiveMode) {
+            this.toPerspective();
+        }
+        else {
+            this.toOrthographic();
+        }
+    };
+    CombinedCamera.prototype.toFrontView = function () {
+        this.rotation.x = 0;
+        this.rotation.y = 0;
+        this.rotation.z = 0;
+        // should we be modifing the matrix instead?
+        this.rotationAutoUpdate = false;
+    };
+    CombinedCamera.prototype.toBackView = function () {
+        this.rotation.x = 0;
+        this.rotation.y = Math.PI;
+        this.rotation.z = 0;
+        this.rotationAutoUpdate = false;
+    };
+    CombinedCamera.prototype.toLeftView = function () {
+        this.rotation.x = 0;
+        this.rotation.y = -Math.PI / 2;
+        this.rotation.z = 0;
+        this.rotationAutoUpdate = false;
+    };
+    CombinedCamera.prototype.toRightView = function () {
+        this.rotation.x = 0;
+        this.rotation.y = Math.PI / 2;
+        this.rotation.z = 0;
+        this.rotationAutoUpdate = false;
+    };
+    CombinedCamera.prototype.toTopView = function () {
+        this.rotation.x = -Math.PI / 2;
+        this.rotation.y = 0;
+        this.rotation.z = 0;
+        this.rotationAutoUpdate = false;
+    };
+    CombinedCamera.prototype.toBottomView = function () {
+        this.rotation.x = Math.PI / 2;
+        this.rotation.y = 0;
+        this.rotation.z = 0;
+        this.rotationAutoUpdate = false;
+    };
+    return CombinedCamera;
+})(Camera);
+//# sourceMappingURL=CombinedCamera.js.map
+;
+///<reference path="../../../vendor/three.d.ts"/>
+///<reference path="../../../vendor/three-canvasrenderer.d.ts"/>
+///<reference path="../../../vendor/three-projector.d.ts"/>
+///<reference path="CombinedCamera.ts"/>
+///<reference path="../Vector/Vector2D.ts"/>
+///<reference path="../Conway/ConwayGrid.ts"/>
+var Raycaster = THREE.Raycaster;
+var Vector2 = THREE.Vector2;
+var Mesh = THREE.Mesh;
+var Object3D = THREE.Object3D;
+var ThreeView = (function () {
+    function ThreeView(element) {
+        var _this = this;
+        this.size = 500;
+        this.gridWidth = 50;
+        this.rotating = true;
+        this.width = 20;
+        this.height = 20;
+        this.animate = function () {
+            if (_this.rotating) {
+                var timer = Date.now() * 0.0001;
+                _this.camera.position.x = Math.cos(timer) * 200;
+                _this.camera.position.z = Math.sin(timer) * 200;
+            }
+            requestAnimationFrame(_this.animate);
+            _this.render();
+        };
+        this.onDocumentMouseMove = function (event) {
+            event.preventDefault();
+            _this.mouse.set((event.clientX / window.innerWidth) * 2 - 1, -(event.clientY / window.innerHeight) * 2 + 1);
+            _this.raycaster.setFromCamera(_this.mouse, _this.camera);
+            var intersects = _this.raycaster.intersectObjects(_this.objects);
+            if (intersects.length > 0) {
+                var intersect = intersects[0];
+                _this.rollOverMesh.position.copy(intersect.point).add(intersect.face.normal);
+                _this.rollOverMesh.position.divideScalar(50).floor().multiplyScalar(50).addScalar(25);
+            }
+            _this.render();
+        };
+        this.onDocumentMouseDown = function (event) {
+            event.preventDefault();
+            _this.mouse.set((event.clientX / window.innerWidth) * 2 - 1, -(event.clientY / window.innerHeight) * 2 + 1);
+            _this.raycaster.setFromCamera(_this.mouse, _this.camera);
+            var intersects = _this.raycaster.intersectObjects(_this.objects);
+            if (intersects.length > 0) {
+                var intersect = intersects[0];
+                // delete cube
+                if (intersect.object != _this.plane) {
+                    _this.scene.remove(intersect.object);
+                    _this.objects.splice(_this.objects.indexOf(intersect.object), 1);
+                }
+                else {
+                    var voxel = _this.cube();
+                    voxel.position.copy(intersect.point).add(intersect.face.normal);
+                    voxel.position.divideScalar(50).floor().multiplyScalar(50).addScalar(25);
+                    _this.scene.add(voxel);
+                    _this.objects.push(voxel);
+                }
+                _this.render();
+            }
+        };
+        this.lookAtScene = true;
+        this.container = element;
+        this.grid = new ConwayGrid(this.width, this.height, this);
+        //this.camera = new CombinedCamera(window.innerWidth / 2, window.innerHeight / 2, 70, 1, 1000, - 500, 1000);
+        this.camera = new THREE.OrthographicCamera(window.innerWidth / -2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / -2, -500, 1000);
+        this.camera.position.x = 200;
+        this.camera.position.y = 100;
+        this.camera.position.z = 200;
+        this.objects = [];
+        this.scene = new THREE.Scene();
+        this.raycaster = new THREE.Raycaster();
+        this.mouse = new THREE.Vector2();
+        this.addGridToScene();
+        this.addPlaneToScene();
+        this.addCubesToScene();
+        this.addLightsToScene();
+        this.addRollOverHelpersToScene();
+        document.addEventListener('mousemove', this.onDocumentMouseMove, false);
+        document.addEventListener('mousedown', this.onDocumentMouseDown, false);
+        //        document.addEventListener( 'keydown', onDocumentKeyDown, false );
+        //        document.addEventListener( 'keyup', onDocumentKeyUp, false );
+        this.renderer = new THREE.CanvasRenderer();
+        this.renderer.setClearColor(0xf0f0f0);
+        this.renderer.setPixelRatio(window.devicePixelRatio);
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.container.appendChild(this.renderer.domElement);
+        //stats = new Stats();
+        //stats.domElement.style.position = 'absolute';
+        //stats.domElement.style.top = '0px';
+        //this.container.appendChild(stats.domElement);
+        window.addEventListener('resize', this.onWindowResize, false);
+        this.animate();
+    }
+    /**
+     * Add a grid to the scene
+     */
+    ThreeView.prototype.addGridToScene = function () {
+        // Grid
+        var size = this.size;
+        var step = 50;
+        var geometry = new THREE.Geometry();
+        for (var i = -size; i <= size; i += step) {
+            geometry.vertices.push(new THREE.Vector3(-size, 0, i));
+            geometry.vertices.push(new THREE.Vector3(size, 0, i));
+            geometry.vertices.push(new THREE.Vector3(i, 0, -size));
+            geometry.vertices.push(new THREE.Vector3(i, 0, size));
+        }
+        var lineBasicMaterial = new THREE.LineBasicMaterial({ color: 0x000000, opacity: 0.2 });
+        var line = new THREE.LineSegments(geometry, lineBasicMaterial);
+        this.scene.add(line);
+    };
+    /**
+     * Add a plane to the scene
+     */
+    ThreeView.prototype.addPlaneToScene = function () {
+        var geometry = new THREE.PlaneBufferGeometry(1000, 1000);
+        geometry.rotateX(-Math.PI / 2);
+        this.plane = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ visible: false }));
+        this.scene.add(this.plane);
+        this.objects.push(this.plane);
+    };
+    /**
+     * Add cubes to the scene
+     */
+    ThreeView.prototype.addCubesToScene = function () {
+        for (var _i = 0, _a = this.grid.matrix; _i < _a.length; _i++) {
+            var column = _a[_i];
+            for (var _b = 0; _b < column.length; _b++) {
+                var cell = column[_b];
+                if (cell.isAlive()) {
+                    this.drawCubeAtCoords(cell.coords);
+                }
+            }
+        }
+    };
+    /**
+     * Draw a cube at given coords
+     *
+     * @param coords
+     */
+    ThreeView.prototype.drawCubeAtCoords = function (coords) {
+        // Cubes
+        var boxGeometry = new THREE.BoxGeometry(50, 50, 50);
+        var material = new THREE.MeshLambertMaterial({ color: 0xffffff, overdraw: 0.5 });
+        var x = coords.x;
+        var z = coords.y;
+        var cube = new THREE.Mesh(boxGeometry, material);
+        //cube.scale.y = Math.floor(Math.random() * 2 + 1);
+        cube.scale.y = 1;
+        cube.position.x = Math.floor((x * 50 - 500) / 50) * 50 + 25;
+        cube.position.y = (cube.scale.y * 50) / 2;
+        cube.position.z = Math.floor((z * 50 - 500) / 50) * 50 + 25;
+        this.scene.add(cube);
+    };
+    /**
+     * Add lights to the scene
+     */
+    ThreeView.prototype.addLightsToScene = function () {
+        // Lights
+        var ambientLight = new THREE.AmbientLight(Math.random() * 0x10);
+        this.scene.add(ambientLight);
+        var directionalLight = new THREE.DirectionalLight(Math.random() * 0xffffff);
+        directionalLight.position.x = Math.random() - 0.5;
+        directionalLight.position.y = Math.random() - 0.5;
+        directionalLight.position.z = Math.random() - 0.5;
+        directionalLight.position.normalize();
+        this.scene.add(directionalLight);
+        var directionalLight = new THREE.DirectionalLight(Math.random() * 0xffffff);
+        directionalLight.position.x = Math.random() - 0.5;
+        directionalLight.position.y = Math.random() - 0.5;
+        directionalLight.position.z = Math.random() - 0.5;
+        directionalLight.position.normalize();
+        this.scene.add(directionalLight);
+    };
+    ThreeView.prototype.addRollOverHelpersToScene = function () {
+        // roll-over helpers
+        var rollOverGeo = new THREE.BoxGeometry(50, 50, 50);
+        var rollOverMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, opacity: 0.5, transparent: true });
+        this.rollOverMesh = new THREE.Mesh(rollOverGeo, rollOverMaterial);
+        this.scene.add(this.rollOverMesh);
+    };
+    ThreeView.prototype.render = function () {
+        if (this.lookAtScene)
+            this.camera.lookAt(this.scene.position);
+        this.renderer.render(this.scene, this.camera);
+    };
+    ThreeView.prototype.setFov = function (fov) {
+        this.camera.setFov(fov);
+        console.log('FOV ' + fov.toFixed(2) + '&deg;');
+    };
+    ThreeView.prototype.setLens = function (lens) {
+        // try adding a tween effect while changing focal length, and it'd be even cooler!
+        var fov = this.camera.setLens(lens);
+        console.log('Converted ' + lens + 'mm lens to FOV ' + fov.toFixed(2) + '&deg;');
+    };
+    /*
+    setOrthographic() {
+        this.camera.toOrthographic();
+        console.log('Orthographic mode');
+    }
+
+     setPerspective() {
+        this.camera.toPerspective();
+        console.log('Perspective mode');
+    }
+    */
+    //init() {
+    //
+    //}
+    ThreeView.prototype.onWindowResize = function () {
+        this.camera.setSize(window.innerWidth, window.innerHeight);
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+    };
+    /**
+     * Get or initialize the camerathis.
+     *
+     * @returns {Camera}
+     */
+    ThreeView.prototype.getCamera = function () {
+        if (typeof this.camera === undefined) {
+        }
+        return this.camera;
+    };
+    ThreeView.prototype.update = function (cell) {
+        if (cell.value) {
+            this.drawCubeAtCoords(cell.coords);
+        }
+        //else {
+        //    this.removeCubeAtCoords(cell.coords);
+        //}
+    };
+    /**
+     *
+     * @returns {THREE.Mesh}
+     */
+    ThreeView.prototype.cube = function () {
+        var cubeGeo = new THREE.BoxGeometry(50, 50, 50);
+        var cubeMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff, overdraw: 0.5 });
+        return new THREE.Mesh(cubeGeo, cubeMaterial);
+    };
+    return ThreeView;
+})();
+//# sourceMappingURL=ThreeView.js.map
